@@ -11,7 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -24,20 +23,15 @@ public class CinemaSpringApplication {
         SpringApplication.run(CinemaSpringApplication.class, args);
     }
 
-    /**
-     * Инициализация тестовых данных при старте приложения.
-     * Заполняем фильмы, сеансы и пользователей (admin / user).
-     */
     @Bean
     public CommandLineRunner dataLoader(MovieRepository movieRepository,
                                         ScreeningRepository screeningRepository,
                                         TicketRepository ticketRepository,
-                                        AppUserRepository userRepository) {
+                                        AppUserRepository userRepository,
+                                        PasswordEncoder passwordEncoder) {
         return args -> {
 
-            // --- Фильмы и сеансы ---
             if (movieRepository.count() == 0) {
-
                 Movie matrix = new Movie(
                         "The Matrix",
                         "Sci-fi classic about the nature of reality.",
@@ -71,20 +65,17 @@ public class CinemaSpringApplication {
                 screeningRepository.save(screening2);
             }
 
-            // --- Пользователи ---
             if (userRepository.count() == 0) {
-                PasswordEncoder encoder = new BCryptPasswordEncoder();
-
                 AppUser admin = new AppUser();
                 admin.setUsername("admin");
-                admin.setPassword(encoder.encode("admin")); // пароль: admin
+                admin.setPassword(passwordEncoder.encode("admin")); // логин/пароль: admin/admin
                 admin.setFullName("Administrator");
                 admin.addRole("ADMIN");
                 admin.addRole("USER");
 
                 AppUser user = new AppUser();
                 user.setUsername("user");
-                user.setPassword(encoder.encode("user"));   // пароль: user
+                user.setPassword(passwordEncoder.encode("user"));   // логин/пароль: user/user
                 user.setFullName("Regular User");
                 user.addRole("USER");
 
