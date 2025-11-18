@@ -2,71 +2,76 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cinema</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<header>
-    <h1>Cinema</h1>
 
-    <div>
-        <!-- гость -->
-        <div th:if="${#authorization.expression('isAnonymous()')}">
-            <a th:href="@{/login}">Login</a>
-        </div>
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">My tickets</a>
+        </span>
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/movies}">Admin</a>
+        </span>
+    </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Login</a>
 
-        <!-- вошедший пользователь -->
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
-            Вы вошли как <span th:text="${#authentication.name}">user</span>.
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit">Logout</button>
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Logout</button>
             </form>
-
-            <!-- ссылка в админку только для ADMIN -->
-            <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                | <a th:href="@{/admin/movies}">Admin panel</a>
-            </span>
-        </div>
+        </span>
     </div>
 </header>
 
-<hr/>
+<main class="container">
+    <h1>Welcome to Cinema</h1>
+    <p>Browse movies, check screenings and book tickets online.</p>
 
-<h2>Movies</h2>
-<ul>
-    <li th:each="m : ${movies}">
-        <strong th:text="${m.title}">Title</strong>
-        (<span th:text="${m.durationMinutes}">120</span> min)
-        <div th:text="${m.description}">Description</div>
-    </li>
-</ul>
+    <h2>Movies</h2>
+    <ul>
+        <li th:each="m : ${movies}">
+            <strong th:text="${m.title}">Title</strong>
+            (<span th:text="${m.durationMinutes}">120</span> min)
+            <div th:text="${m.description}">Description</div>
+        </li>
+    </ul>
 
-<h2>Screenings</h2>
-<table border="1" cellpadding="4">
-    <tr>
-        <th>Movie</th>
-        <th>Start time</th>
-        <th>Hall</th>
-        <th>Price</th>
-        <th>Action</th>
-    </tr>
-    <tr th:each="s : ${screenings}">
-        <td th:text="${s.movie.title}">Movie title</td>
-        <td th:text="${s.startTime}">2024-01-01T19:00</td>
-        <td th:text="${s.hall}">Hall 1</td>
-        <td th:text="${s.price}">9.99</td>
-        <td>
-            <!-- для USER показываем кнопку бронирования -->
-            <a th:if="${#authorization.expression('hasRole(''USER'')')}"
-               th:href="@{|/tickets/book/${s.id}|}">
-                Book
-            </a>
-
-            <!-- для гостя подсказка залогиниться -->
-            <span th:if="${#authorization.expression('isAnonymous()')}">
-                <a th:href="@{/login}">Login to book</a>
-            </span>
-        </td>
-    </tr>
-</table>
+    <h2>Upcoming screenings</h2>
+    <table>
+        <tr>
+            <th>Movie</th>
+            <th>Start time</th>
+            <th>Hall</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        <tr th:each="s : ${screenings}">
+            <td th:text="${s.movie.title}">Movie</td>
+            <td th:text="${s.startTime}">Time</td>
+            <td th:text="${s.hall}">Hall</td>
+            <td th:text="${s.price}">Price</td>
+            <td>
+                <a th:if="${#authorization.expression('hasRole(''USER'')')}"
+                   th:href="@{|/tickets/book/${s.id}|}"
+                   class="btn btn-primary">
+                    Book
+                </a>
+                <span th:if="${#authorization.expression('isAnonymous()')}">
+                    <a th:href="@{/login}">Login to book</a>
+                </span>
+            </td>
+        </tr>
+    </table>
+</main>
 
 </body>
 </html>

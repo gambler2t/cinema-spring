@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <title>My tickets</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -32,31 +32,30 @@
     </div>
 </header>
 
-
 <main class="container">
-    <h1>Login</h1>
+    <h1>My tickets</h1>
 
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label>Username:<br>
-                <input type="text" name="username">
-            </label>
-        </div>
-        <div style="margin-top:10px;">
-            <label>Password:<br>
-                <input type="password" name="password">
-            </label>
-        </div>
-        <div style="margin-top:16px;">
-            <button type="submit" class="btn btn-primary">Log in</button>
-        </div>
-    </form>
-
-    <p style="margin-top:16px;">
-        Test users:<br>
-        <strong>admin / admin</strong> (ADMIN + USER)<br>
-        <strong>user / user</strong> (USER)
-    </p>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Movie</th>
+            <th>Start time</th>
+            <th>Hall</th>
+            <th>Seat</th>
+            <th>Name</th>
+        </tr>
+        <tr th:each="t, idx : ${tickets}">
+            <td th:text="${idx.index + 1}">1</td>
+            <td th:text="${t.screening.movie.title}">Movie</td>
+            <td th:text="${t.screening.startTime}">Time</td>
+            <td th:text="${t.screening.hall}">Hall</td>
+            <td th:text="${t.seat}">A1</td>
+            <td th:text="${t.customerName}">Name</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(tickets)}">
+            <td colspan="6">You have no tickets yet.</td>
+        </tr>
+    </table>
 </main>
 
 </body>

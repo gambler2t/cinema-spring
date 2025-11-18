@@ -2,58 +2,136 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Book ticket</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<h1>Book ticket</h1>
 
-<div th:object="${ticket}">
-    <p>
-        Movie:
-        <span th:text="*{screening.movie.title}">Movie title</span>
-    </p>
-    <p>
-        Start time:
-        <span th:text="*{screening.startTime}">2024-01-01T19:00</span>
-    </p>
-    <p>
-        Hall:
-        <span th:text="*{screening.hall}">Hall 1</span>
-    </p>
-    <p>
-        Price:
-        <span th:text="*{screening.price}">9.99</span>
-    </p>
-</div>
-
-<form th:action="@{/tickets/book}"
-      th:object="${ticket}"
-      method="post">
-
-    <!-- скрытое поле с id сеанса -->
-    <input type="hidden" th:field="*{screening.id}"/>
-
-    <div>
-        <label>Your name:
-            <input type="text" th:field="*{customerName}">
-        </label>
-        <div th:if="${#fields.hasErrors('customerName')}"
-             th:errors="*{customerName}">Name error</div>
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
     </div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">My tickets</a>
+        </span>
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/movies}">Admin</a>
+        </span>
+    </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Login</a>
 
-    <div>
-        <label>Seat:
-            <input type="text" th:field="*{seat}">
-        </label>
-        <div th:if="${#fields.hasErrors('seat')}"
-             th:errors="*{seat}">Seat error</div>
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        </span>
     </div>
+</header>
 
-    <button type="submit">Confirm booking</button>
-</form>
+<main class="container" th:object="${ticket}">
+    <h1>Book ticket</h1>
 
-<p>
-    <a th:href="@{/}">Back to main page</a>
-</p>
+    <section class="ticket-screening-info">
+        <p>
+            <span class="tag">Movie</span>
+            <strong th:text="*{screening.movie.title}">Movie title</strong>
+        </p>
+        <p>
+            <span class="tag">Start</span>
+            <span th:text="*{screening.startTime}">2025-01-01T19:00</span>
+        </p>
+        <p>
+            <span class="tag">Hall</span>
+            <span th:text="*{screening.hall}">Hall 1</span>
+            &nbsp;&nbsp;
+            <span class="tag">Price</span>
+            <span th:text="*{screening.price}">9.99</span>
+        </p>
+    </section>
+
+    <section class="seat-map-section">
+        <h2>Choose a seat</h2>
+
+        <div class="screen-indicator">SCREEN</div>
+
+        <div class="seat-map">
+            <div class="seat-row" th:each="r : ${rows}">
+                <div class="row-label" th:text="${r}">1</div>
+                <button type="button"
+                        th:each="s : ${seats}"
+                        class="seat"
+                        th:text="${s}"
+                        th:data-seat-id="${r + '-' + s}"
+                        th:classappend="${occupiedSeats.contains(r + '-' + s)} ? ' seat-occupied'">
+                </button>
+                <div class="row-label" th:text="${r}">1</div>
+            </div>
+        </div>
+
+        <div class="seat-legend">
+            <span><span class="legend-box seat-free"></span> Free</span>
+            <span><span class="legend-box seat-occupied"></span> Taken</span>
+            <span><span class="legend-box seat-selected"></span> Your choice</span>
+        </div>
+    </section>
+
+    <section class="ticket-form-section">
+        <form th:action="@{/tickets/book}"
+              th:object="${ticket}"
+              method="post">
+
+            <input type="hidden" th:field="*{screening.id}"/>
+            <input type="hidden" th:field="*{seat}" id="selectedSeat"/>
+
+            <div>
+                <label>Your name:<br>
+                    <input type="text" th:field="*{customerName}">
+                </label>
+                <div th:if="${#fields.hasErrors('customerName')}"
+                     th:errors="*{customerName}">Name error</div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <label>Selected seat:<br>
+                    <span id="seatDisplay">(none)</span>
+                </label>
+                <div th:if="${#fields.hasErrors('seat')}"
+                     th:errors="*{seat}">Seat error</div>
+            </div>
+
+            <div style="margin-top:16px;">
+                <button type="submit" class="btn btn-primary">Confirm booking</button>
+                <a th:href="@{/screenings}" class="btn btn-secondary">Back</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const seats = document.querySelectorAll('.seat-map .seat');
+        const seatInput = document.getElementById('selectedSeat');
+        const seatDisplay = document.getElementById('seatDisplay');
+
+        seats.forEach(seat => {
+            if (seat.classList.contains('seat-occupied')) {
+                seat.disabled = true;
+                return;
+            }
+            seat.addEventListener('click', () => {
+                seats.forEach(s => s.classList.remove('seat-selected'));
+                seat.classList.add('seat-selected');
+                const seatId = seat.dataset.seatId;
+                seatInput.value = seatId;
+                seatDisplay.textContent = seatId;
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

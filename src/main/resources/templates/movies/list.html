@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movies</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand"><a th:href="@{/}">Cinema</a></div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">My tickets</a>
+        </span>
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/movies}">Admin</a>
+        </span>
+    </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Login</a>
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        </span>
+    </div>
+</header>
+
+<main class="page-layout">
+    <!-- ЛЕВЫЙ БОКОВОЙ БАННЕР -->
+    <aside class="side-banner">
+        <div class="side-banner-card">
+            <img th:src="@{/images/tgd.jpg}" alt="Promo">
+            <div class="side-banner-body">
+                <h3>Сегодня в кино</h3>
+                <p>Лови лучшие премьеры и не пропусти любимые фильмы на большом экране.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ЦЕНТРАЛЬНАЯ ОБЛАСТЬ С ФИЛЬМАМИ -->
+    <section class="container-wide movies-main">
+        <h1>Movies</h1>
+
+        <form class="search-bar" th:action="@{/movies}" method="get">
+            <input type="text" name="q" placeholder="Search by title"
+                   th:value="${query}">
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+
+        <div class="movies-grid">
+            <div class="movie-card" th:each="m : ${movies}">
+                <div class="movie-poster">
+                    <img th:if="${m.posterUrl != null}"
+                         th:src="${m.posterUrl}"
+                         alt="Poster">
+                    <div th:if="${m.posterUrl == null}" class="movie-poster-placeholder">
+                        NO POSTER
+                    </div>
+                </div>
+                <div class="movie-content">
+                    <h3 th:text="${m.title}">Title</h3>
+                    <p class="movie-genre" th:text="${m.genre}">Genre</p>
+                    <p class="movie-desc"
+                       th:text="${#strings.abbreviate(m.description, 120)}">
+                        Short description
+                    </p>
+                </div>
+                <div class="movie-footer">
+                    <span class="tag">
+                        <span th:text="${m.durationMinutes}">120</span> min
+                    </span>
+                    <a th:href="@{|/movies/${m.id}|}" class="btn btn-primary">
+                        Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПРАВЫЙ БОКОВОЙ БАННЕР -->
+    <aside class="side-banner">
+        <div class="side-banner-card">
+            <img th:src="@{/images/tge.jpg}" alt="Promo">
+            <div class="side-banner-body">
+                <h3>Специальные предложения</h3>
+                <p>Скидки на утренние сеансы и билеты в будние дни.</p>
+            </div>
+        </div>
+    </aside>
+</main>
+
+</body>
+</html>

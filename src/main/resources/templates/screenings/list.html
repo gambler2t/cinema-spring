@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <title>Screenings</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -32,31 +32,34 @@
     </div>
 </header>
 
-
 <main class="container">
-    <h1>Login</h1>
+    <h1>Screenings</h1>
 
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label>Username:<br>
-                <input type="text" name="username">
-            </label>
-        </div>
-        <div style="margin-top:10px;">
-            <label>Password:<br>
-                <input type="password" name="password">
-            </label>
-        </div>
-        <div style="margin-top:16px;">
-            <button type="submit" class="btn btn-primary">Log in</button>
-        </div>
-    </form>
-
-    <p style="margin-top:16px;">
-        Test users:<br>
-        <strong>admin / admin</strong> (ADMIN + USER)<br>
-        <strong>user / user</strong> (USER)
-    </p>
+    <table>
+        <tr>
+            <th>Movie</th>
+            <th>Start time</th>
+            <th>Hall</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        <tr th:each="s : ${screenings}">
+            <td th:text="${s.movie.title}">Movie</td>
+            <td th:text="${s.startTime}">Time</td>
+            <td th:text="${s.hall}">Hall</td>
+            <td th:text="${s.price}">Price</td>
+            <td>
+                <a th:if="${#authorization.expression('hasRole(''USER'')')}"
+                   th:href="@{|/tickets/book/${s.id}|}"
+                   class="btn btn-primary">
+                    Book
+                </a>
+                <span th:if="${#authorization.expression('isAnonymous()')}">
+                    <a th:href="@{/login}">Login to book</a>
+                </span>
+            </td>
+        </tr>
+    </table>
 </main>
 
 </body>

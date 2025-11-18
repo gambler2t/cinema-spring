@@ -16,6 +16,11 @@ public class Ticket {
     @JoinColumn(name = "screening_id")
     private Screening screening;
 
+    // владелец билета (пользователь)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private AppUser user;
+
     @NotBlank
     private String customerName;
 
@@ -25,8 +30,9 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(Screening screening, String customerName, String seat) {
+    public Ticket(Screening screening, AppUser user, String customerName, String seat) {
         this.screening = screening;
+        this.user = user;
         this.customerName = customerName;
         this.seat = seat;
     }
@@ -47,6 +53,14 @@ public class Ticket {
 
     public void setScreening(Screening screening) {
         this.screening = screening;
+    }
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
     }
 
     public String getCustomerName() {

@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -24,23 +23,22 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        // ЭТИ URL ДОСТУПНЫ ВСЕМ, ВКЛЮЧАЯ ГОСТЕЙ
-                        .requestMatchers("/", "/login",
+                        // открытые страницы
+                        .requestMatchers("/", "/login", "/movies", "/screenings",
                                 "/css/**", "/js/**", "/images/**").permitAll()
                         // админка
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // билеты только для USER
-                        .requestMatchers("/tickets/**").hasRole("USER")
-                        // всё остальное требует авторизации
+                        // профиль пользователя и билеты
+                        .requestMatchers("/user/**", "/tickets/**").hasRole("USER")
+                        // всё остальное требует входа
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")        // наша страница логина
+                        .loginPage("/login")
                         .permitAll()
                         .defaultSuccessUrl("/", true)
                 )
                 .logout(logout -> logout
-                        // стандартный logout: POST /logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .permitAll()
@@ -52,7 +50,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

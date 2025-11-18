@@ -1,0 +1,390 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background-color: #f5f5f7;
+    color: #222;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.topbar {
+    background-color: #1f2933;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+}
+
+.topbar .brand a {
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.topbar nav a {
+    margin-right: 16px;
+    color: #d1e2ff;
+}
+
+.topbar .auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.container {
+    max-width: 960px;
+    margin: 24px auto;
+    padding: 0 16px 40px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+table th, table td {
+    border: 1px solid #e0e0e0;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+table th {
+    background-color: #f3f4f6;
+}
+
+.btn, button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+form.inline {
+    display: inline;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #d1e2ff;
+    font: inherit;
+    cursor: pointer;
+}
+
+.search-bar {
+    margin: 12px 0 16px;
+}
+
+.search-bar input[type="text"] {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    width: 220px;
+}
+
+.search-bar button {
+    margin-left: 8px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background-color: #e5e7eb;
+}
+
+/* --- movie cards --- */
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.movie-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+.movie-poster-placeholder {
+    width: 100%;
+    height: 300px;
+    background: #111827;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.movie-content {
+    padding: 10px 12px 4px;
+}
+
+.movie-content h3 {
+    margin: 0 0 4px;
+}
+
+.movie-genre {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.movie-desc {
+    margin: 0;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.movie-footer {
+    padding: 8px 12px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- movie details --- */
+
+.movie-details .movie-hero {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+}
+
+.movie-hero-poster img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.movie-hero-info h1 {
+    margin-top: 0;
+}
+
+.movie-hero-actions {
+    margin-top: 16px;
+}
+
+.movie-description {
+    margin-top: 32px;
+}
+
+.movie-screenings {
+    margin-top: 32px;
+}
+
+/* --- seat map --- */
+
+.seat-map-section {
+    margin-top: 24px;
+}
+
+.screen-indicator {
+    margin: 8px auto 16px;
+    width: 60%;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #ec4899, #8b5cf6);
+    text-align: center;
+    color: #f9fafb;
+    font-size: 10px;
+    line-height: 8px;
+}
+
+.seat-map {
+    display: inline-block;
+    padding: 12px 16px;
+    background-color: #111827;
+    border-radius: 16px;
+    color: #e5e7eb;
+}
+
+.seat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.row-label {
+    width: 18px;
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.seat {
+    width: 24px;
+    height: 24px;
+    margin: 2px;
+    border-radius: 4px;
+    border: 1px solid #4b5563;
+    background-color: #111827;
+    color: #9ca3af;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.seat:hover {
+    border-color: #c4b5fd;
+}
+
+.seat-occupied {
+    background-color: #4b5563;
+    border-color: #4b5563;
+    color: #111827;
+    cursor: default;
+}
+
+.seat-selected {
+    background-color: #ec4899;
+    border-color: #f9a8d4;
+    color: #f9fafb;
+}
+
+.seat-legend {
+    margin-top: 10px;
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+}
+
+.legend-box {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #4b5563;
+    margin-right: 4px;
+}
+
+.seat-free {
+    background-color: #111827;
+}
+
+/* --- расширенный лэйаут для страницы фильмов с боковыми баннерами --- */
+
+.page-layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px 32px 40px;
+}
+
+.container-wide {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0;
+    padding: 16px 24px 32px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.movies-main h1 {
+    margin-top: 0;
+}
+
+.side-banner {
+    flex: 0 0 220px;
+    position: sticky;
+    top: 72px; /* чтобы баннер "прилипал" чуть ниже хедера */
+}
+
+.side-banner-card {
+    background: radial-gradient(circle at top, #f97316 0, #7c2d12 45%, #020617 100%);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+    color: #f9fafb;
+    text-align: left;
+}
+
+.side-banner-card img {
+    display: block;
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+}
+
+.side-banner-body {
+    padding: 12px 14px 14px;
+}
+
+.side-banner-body h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+
+.side-banner-body p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* адаптив: на маленьких экранах убираем боковые баннеры и даём контенту всю ширину */
+
+@media (max-width: 1100px) {
+    .page-layout {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .side-banner {
+        display: none;
+    }
+
+    .container-wide {
+        margin: 0 auto;
+        padding: 16px;
+    }
+}
