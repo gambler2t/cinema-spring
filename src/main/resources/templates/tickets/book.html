@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book ticket</title>
+</head>
+<body>
+<h1>Book ticket</h1>
+
+<div th:object="${ticket}">
+    <p>
+        Movie:
+        <span th:text="*{screening.movie.title}">Movie title</span>
+    </p>
+    <p>
+        Start time:
+        <span th:text="*{screening.startTime}">2024-01-01T19:00</span>
+    </p>
+    <p>
+        Hall:
+        <span th:text="*{screening.hall}">Hall 1</span>
+    </p>
+    <p>
+        Price:
+        <span th:text="*{screening.price}">9.99</span>
+    </p>
+</div>
+
+<form th:action="@{/tickets/book}"
+      th:object="${ticket}"
+      method="post">
+
+    <!-- скрытое поле с id сеанса -->
+    <input type="hidden" th:field="*{screening.id}"/>
+
+    <div>
+        <label>Your name:
+            <input type="text" th:field="*{customerName}">
+        </label>
+        <div th:if="${#fields.hasErrors('customerName')}"
+             th:errors="*{customerName}">Name error</div>
+    </div>
+
+    <div>
+        <label>Seat:
+            <input type="text" th:field="*{seat}">
+        </label>
+        <div th:if="${#fields.hasErrors('seat')}"
+             th:errors="*{seat}">Seat error</div>
+    </div>
+
+    <button type="submit">Confirm booking</button>
+</form>
+
+<p>
+    <a th:href="@{/}">Back to main page</a>
+</p>
+
+</body>
+</html>

@@ -4,20 +4,69 @@
     <title>Cinema</title>
 </head>
 <body>
-<h1>Welcome to Cinema</h1>
+<header>
+    <h1>Cinema</h1>
 
-<p>Это временная главная страница. Потом сделаем нормальный фронт.</p>
+    <div>
+        <!-- гость -->
+        <div th:if="${#authorization.expression('isAnonymous()')}">
+            <a th:href="@{/login}">Login</a>
+        </div>
 
-<div>
-    <div th:if="${#authorization.expression('isAuthenticated()')}">
-        Вы вошли как <span th:text="${#authentication.name}">user</span>.
-        <a th:href="@{/logout}">Logout</a>
+        <!-- вошедший пользователь -->
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            Вы вошли как <span th:text="${#authentication.name}">user</span>.
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
 
-        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-        | <a th:href="@{/admin/movies}">Admin panel</a>
-    </span>
+            <!-- ссылка в админку только для ADMIN -->
+            <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                | <a th:href="@{/admin/movies}">Admin panel</a>
+            </span>
+        </div>
     </div>
-</div>
+</header>
+
+<hr/>
+
+<h2>Movies</h2>
+<ul>
+    <li th:each="m : ${movies}">
+        <strong th:text="${m.title}">Title</strong>
+        (<span th:text="${m.durationMinutes}">120</span> min)
+        <div th:text="${m.description}">Description</div>
+    </li>
+</ul>
+
+<h2>Screenings</h2>
+<table border="1" cellpadding="4">
+    <tr>
+        <th>Movie</th>
+        <th>Start time</th>
+        <th>Hall</th>
+        <th>Price</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="s : ${screenings}">
+        <td th:text="${s.movie.title}">Movie title</td>
+        <td th:text="${s.startTime}">2024-01-01T19:00</td>
+        <td th:text="${s.hall}">Hall 1</td>
+        <td th:text="${s.price}">9.99</td>
+        <td>
+            <!-- для USER показываем кнопку бронирования -->
+            <a th:if="${#authorization.expression('hasRole(''USER'')')}"
+               th:href="@{|/tickets/book/${s.id}|}">
+                Book
+            </a>
+
+            <!-- для гостя подсказка залогиниться -->
+            <span th:if="${#authorization.expression('isAnonymous()')}">
+                <a th:href="@{/login}">Login to book</a>
+            </span>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>
