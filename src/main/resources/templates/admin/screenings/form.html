@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Screening form</title>
+</head>
+<body>
+<h1 th:text="${screening.id == null} ? 'New screening' : 'Edit screening'">Screening form</h1>
+
+<form th:action="${screening.id == null} ? @{/admin/screenings} : @{|/admin/screenings/${screening.id}|}"
+      th:object="${screening}"
+      method="post">
+
+    <div>
+        <label>Movie:
+            <select th:field="*{movie}">
+                <option th:each="m : ${movies}"
+                        th:value="${m.id}"
+                        th:text="${m.title}">
+                </option>
+            </select>
+        </label>
+    </div>
+
+    <div>
+        <label>Start time:
+            <input type="datetime-local" th:field="*{startTime}">
+        </label>
+        <div th:if="${#fields.hasErrors('startTime')}"
+             th:errors="*{startTime}">Error</div>
+    </div>
+
+    <div>
+        <label>Hall:
+            <input type="text" th:field="*{hall}">
+        </label>
+        <div th:if="${#fields.hasErrors('hall')}"
+             th:errors="*{hall}">Error</div>
+    </div>
+
+    <div>
+        <label>Price:
+            <input type="number" step="0.01" th:field="*{price}">
+        </label>
+        <div th:if="${#fields.hasErrors('price')}"
+             th:errors="*{price}">Error</div>
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<p>
+    <a th:href="@{/admin/screenings}">Back to list</a>
+</p>
+
+</body>
+</html>

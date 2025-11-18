@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movie form</title>
+</head>
+<body>
+<h1 th:text="${movie.id == null} ? 'New movie' : 'Edit movie'">Movie form</h1>
+
+<form th:action="${movie.id == null} ? @{/admin/movies} : @{|/admin/movies/${movie.id}|}"
+      th:object="${movie}"
+      method="post">
+
+    <div>
+        <label>Title:
+            <input type="text" th:field="*{title}">
+        </label>
+        <div th:if="${#fields.hasErrors('title')}"
+             th:errors="*{title}">Error</div>
+    </div>
+
+    <div>
+        <label>Duration (minutes):
+            <input type="number" th:field="*{durationMinutes}">
+        </label>
+        <div th:if="${#fields.hasErrors('durationMinutes')}"
+             th:errors="*{durationMinutes}">Error</div>
+    </div>
+
+    <div>
+        <label>Description:
+            <textarea th:field="*{description}" rows="4"></textarea>
+        </label>
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<p>
+    <a th:href="@{/admin/movies}">Back to list</a>
+</p>
+
+</body>
+</html>

@@ -9,13 +9,13 @@
 <p>Это временная главная страница. Потом сделаем нормальный фронт.</p>
 
 <div>
-    <div th:if="${#authorization.expression('isAnonymous()')}">
-        <a th:href="@{/login}">Login</a>
-    </div>
-
     <div th:if="${#authorization.expression('isAuthenticated()')}">
         Вы вошли как <span th:text="${#authentication.name}">user</span>.
         <a th:href="@{/logout}">Logout</a>
+
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+        | <a th:href="@{/admin/movies}">Admin panel</a>
+    </span>
     </div>
 </div>
 
