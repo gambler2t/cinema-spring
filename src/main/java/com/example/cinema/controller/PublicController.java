@@ -1,15 +1,19 @@
 package com.example.cinema.controller;
 
+import com.example.cinema.domain.AppUser;
 import com.example.cinema.domain.Movie;
 import com.example.cinema.domain.Screening;
+import com.example.cinema.dto.RegistrationForm;
+import com.example.cinema.repo.AppUserRepository;
 import com.example.cinema.repo.MovieRepository;
 import com.example.cinema.repo.ScreeningRepository;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,22 +24,85 @@ public class PublicController {
 
     private final MovieRepository movieRepository;
     private final ScreeningRepository screeningRepository;
+    private final AppUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PublicController(MovieRepository movieRepository,
-                            ScreeningRepository screeningRepository) {
+                            ScreeningRepository screeningRepository,
+                            AppUserRepository userRepository,
+                            PasswordEncoder passwordEncoder) {
         this.movieRepository = movieRepository;
         this.screeningRepository = screeningRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    // Главная — сразу на список фильмов
     @GetMapping("/")
     public String home() {
         return "redirect:/movies";
     }
 
+    // Страница логина
     @GetMapping("/login")
     public String login() {
         return "login";
     }
+
+    // ---------- РЕГИСТРАЦИЯ ----------
+
+    @GetMapping("/register")
+    public String showRegisterForm(Model model) {
+        model.addAttribute("form", new RegistrationForm());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String processRegister(
+            @Valid @ModelAttribute("form") RegistrationForm form,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        // Базовая валидация
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+
+        // Совпадение паролей
+        if (!form.getPassword().equals(form.getConfirmPassword())) {
+            bindingResult.rejectValue(
+                    "confirmPassword",
+                    "password.mismatch",
+                    "Passwords do not match"
+            );
+            return "register";
+        }
+
+        // Уникальность логина
+        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
+            bindingResult.rejectValue(
+                    "username",
+                    "username.exists",
+                    "Username already taken"
+            );
+            return "register";
+        }
+
+        // Создаём пользователя
+        AppUser user = new AppUser();
+        user.setUsername(form.getUsername());
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setFullName(form.getFullName());
+        user.setEmail(form.getEmail());
+        user.addRole("USER"); // новая учётка = обычный пользователь
+
+        userRepository.save(user);
+
+        // После регистрации отправляем на логин
+        return "redirect:/login?registered";
+    }
+
+    // ---------- ПУБЛИЧНЫЕ СТРАНИЦЫ ----------
 
     @GetMapping("/movies")
     public String moviesList(@RequestParam(value = "q", required = false) String query,
@@ -114,7 +181,6 @@ public class PublicController {
 
     @GetMapping("/about")
     public String about() {
-        return "about";   // будет искать шаблон about.html
+        return "about";   // шаблон about.html
     }
-
 }

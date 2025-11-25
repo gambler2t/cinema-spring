@@ -20,6 +20,11 @@ public class AppUser {
 
     private String fullName;
 
+    private String email;
+
+    @Column(length = 1000)
+    private String bio;
+
     // роли: USER, ADMIN и т.п.
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -80,4 +85,21 @@ public class AppUser {
     public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
 }

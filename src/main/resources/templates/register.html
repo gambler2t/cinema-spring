@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Регистрация</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/about}">О кинотеатре</a>
+    </nav>
+    <div class="auth">
+        <a th:href="@{/login}">Login</a>
+    </div>
+</header>
+
+<main class="container">
+    <h1>Регистрация</h1>
+
+    <form th:action="@{/register}" th:object="${form}" method="post">
+        <div>
+            <label>Логин:<br>
+                <input type="text" th:field="*{username}">
+            </label>
+            <div class="field-error" th:if="${#fields.hasErrors('username')}"
+                 th:errors="*{username}"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+            <label>Полное имя:<br>
+                <input type="text" th:field="*{fullName}">
+            </label>
+            <div class="field-error" th:if="${#fields.hasErrors('fullName')}"
+                 th:errors="*{fullName}"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+            <label>Email:<br>
+                <input type="email" th:field="*{email}">
+            </label>
+            <div class="field-error" th:if="${#fields.hasErrors('email')}"
+                 th:errors="*{email}"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+            <label>Пароль:<br>
+                <input type="password" th:field="*{password}">
+            </label>
+            <div class="field-error" th:if="${#fields.hasErrors('password')}"
+                 th:errors="*{password}"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+            <label>Повторите пароль:<br>
+                <input type="password" th:field="*{confirmPassword}">
+            </label>
+            <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                 th:errors="*{confirmPassword}"></div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </div>
+    </form>
+
+    <p style="margin-top:16px;">
+        Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
+    </p>
+</main>
+
+</body>
+</html>
