@@ -537,9 +537,55 @@ form.inline {
     font-size: 13px;
 }
 
-/* уже был, но вдруг — для кнопки "Buy ticket" поменьше */
+/* уже был, но — для кнопки "Buy ticket" поменьше */
 .btn-small {
     padding: 4px 10px;
     font-size: 13px;
 }
+.about-container h1 {
+    margin-bottom: 16px;
+}
 
+.about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.about-card {
+    background-color: #f9fafb;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+    font-size: 14px;
+    color: #374151;
+}
+
+.about-card h2,
+.about-card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.about-map-section {
+    margin-top: 8px;
+}
+
+.about-map-section h2 {
+    margin-bottom: 8px;
+}
+
+.map-wrapper {
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+/* адаптив для узких экранов */
+@media (max-width: 960px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -111,4 +111,10 @@ public class PublicController {
 
         return "movies/details";
     }
+
+    @GetMapping("/about")
+    public String about() {
+        return "about";   // будет искать шаблон about.html
+    }
+
 }
