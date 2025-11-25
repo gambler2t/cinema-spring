@@ -711,3 +711,8 @@ form.inline {
     color: #2563eb;
 }
 
+.field-error {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #b91c1c;
+}

@@ -6,27 +6,25 @@ import jakarta.validation.constraints.Size;
 
 public class RegistrationForm {
 
-    @NotBlank
-    @Size(min = 3, max = 32)
+    @NotBlank(message = "Логин обязателен")
+    @Size(min = 3, max = 32, message = "Логин должен быть от 3 до 32 символов")
     private String username;
 
-    @NotBlank
-    @Size(min = 4, max = 64)
-    private String password;
-
-    @NotBlank
-    @Size(min = 4, max = 64)
-    private String confirmPassword;
-
-    @NotBlank
-    @Size(min = 2, max = 64)
+    @Size(max = 100, message = "Имя слишком длинное")
     private String fullName;
 
-    @Email
-    @NotBlank
+    @Email(message = "Некорректный email")
+    @Size(max = 100, message = "Email слишком длинный")
     private String email;
 
-    // getters/setters
+    @NotBlank(message = "Пароль обязателен")
+    @Size(min = 6, message = "Пароль должен быть не короче 6 символов")
+    private String password;
+
+    @NotBlank(message = "Повтор пароля обязателен")
+    private String confirmPassword;
+
+    // getters / setters
 
     public String getUsername() {
         return username;
@@ -34,22 +32,6 @@ public class RegistrationForm {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 
     public String getFullName() {
@@ -66,5 +48,21 @@ public class RegistrationForm {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }

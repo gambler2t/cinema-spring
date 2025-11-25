@@ -14,17 +14,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import java.security.Principal;
-import java.security.Principal;
-import java.util.Set;
-import java.util.stream.Collectors;
-import com.example.cinema.domain.AppUser;
-import com.example.cinema.repo.AppUserRepository;
 
-
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class PublicController {
@@ -44,79 +40,85 @@ public class PublicController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Главная — сразу на список фильмов
+    // ---------- Главная ----------
+
     @GetMapping("/")
     public String home() {
         return "redirect:/movies";
     }
 
-    // Страница логина
+    // ---------- Логин (только GET, без редиректов) ----------
+
     @GetMapping("/login")
     public String login() {
         return "login";
     }
 
-    // ---------- РЕГИСТРАЦИЯ ----------
+    // ---------- Регистрация ----------
 
     @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        model.addAttribute("form", new RegistrationForm());
+    public String showRegistrationForm(Model model) {
+        if (!model.containsAttribute("registrationForm")) {
+            model.addAttribute("registrationForm", new RegistrationForm());
+        }
         return "register";
     }
 
     @PostMapping("/register")
-    public String processRegister(
-            @Valid @ModelAttribute("form") RegistrationForm form,
+    public String processRegistration(
+            @Valid @ModelAttribute("registrationForm") RegistrationForm form,
             BindingResult bindingResult,
             Model model
     ) {
-        // Базовая валидация
+        // 1) Валидация совпадения паролей
+        if (!bindingResult.hasFieldErrors("password")
+                && !bindingResult.hasFieldErrors("confirmPassword")) {
+            if (!form.getPassword().equals(form.getConfirmPassword())) {
+                bindingResult.rejectValue(
+                        "confirmPassword",
+                        "password.mismatch",
+                        "Пароли не совпадают"
+                );
+            }
+        }
+
+        // 2) Уникальность логина
+        if (!bindingResult.hasFieldErrors("username")
+                && userRepository.existsByUsername(form.getUsername())) {
+            bindingResult.rejectValue(
+                    "username",
+                    "username.taken",
+                    "Пользователь с таким логином уже существует"
+            );
+        }
+
+        // Если есть ошибки — остаёмся на странице регистрации
         if (bindingResult.hasErrors()) {
             return "register";
         }
 
-        // Совпадение паролей
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            bindingResult.rejectValue(
-                    "confirmPassword",
-                    "password.mismatch",
-                    "Passwords do not match"
-            );
-            return "register";
-        }
-
-        // Уникальность логина
-        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
-            bindingResult.rejectValue(
-                    "username",
-                    "username.exists",
-                    "Username already taken"
-            );
-            return "register";
-        }
-
-        // Создаём пользователя
+        // 3) Создаём пользователя
         AppUser user = new AppUser();
         user.setUsername(form.getUsername());
-        user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.setFullName(form.getFullName());
         user.setEmail(form.getEmail());
-        user.addRole("USER"); // новая учётка = обычный пользователь
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.addRole("USER");
 
         userRepository.save(user);
 
-        // После регистрации отправляем на логин
+        // 4) После успешной регистрации — на логин
         return "redirect:/login?registered";
     }
 
-    // ---------- ПУБЛИЧНЫЕ СТРАНИЦЫ ----------
+    // ---------- Публичные страницы ----------
 
     @GetMapping("/movies")
     public String moviesList(@RequestParam(value = "q", required = false) String query,
                              Model model,
                              Principal principal) {
 
-        // поиск фильмов
+        // Поиск фильмов
         List<Movie> movies;
         if (query != null && !query.isBlank()) {
             movies = movieRepository.findByTitleContainingIgnoreCase(query);
@@ -126,22 +128,20 @@ public class PublicController {
         model.addAttribute("movies", movies);
         model.addAttribute("query", query);
 
-        // избранные фильмы текущего пользователя
+        // Избранные фильмы текущего пользователя
         if (principal != null) {
-            AppUser user = userRepository.findByUsername(principal.getName())
-                    .orElse(null);
-
-            if (user != null && user.getFavoriteMovies() != null) {
-                Set<Long> favoriteIds = user.getFavoriteMovies().stream()
-                        .map(Movie::getId)
-                        .collect(Collectors.toSet());
-                model.addAttribute("favoriteIds", favoriteIds);
-            }
+            userRepository.findByUsername(principal.getName()).ifPresent(user -> {
+                if (user.getFavoriteMovies() != null) {
+                    Set<Long> favoriteIds = user.getFavoriteMovies().stream()
+                            .map(Movie::getId)
+                            .collect(Collectors.toSet());
+                    model.addAttribute("favoriteIds", favoriteIds);
+                }
+            });
         }
 
         return "movies/list";
     }
-
 
     @GetMapping("/screenings")
     public String screeningsList(Model model) {
@@ -155,7 +155,7 @@ public class PublicController {
                                @RequestParam(value = "date", required = false)
                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                Model model,
-                               java.security.Principal principal) {
+                               Principal principal) {
 
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + id));
@@ -197,10 +197,12 @@ public class PublicController {
             screeningsForDay = List.of();
         }
 
+        // Флаг "в избранном" для текущего пользователя
         boolean isFavorite = false;
         if (principal != null) {
             AppUser user = userRepository.findByUsername(principal.getName()).orElse(null);
-            if (user != null && user.getFavoriteMovies().contains(movie)) {
+            if (user != null && user.getFavoriteMovies() != null
+                    && user.getFavoriteMovies().contains(movie)) {
                 isFavorite = true;
             }
         }
@@ -216,6 +218,6 @@ public class PublicController {
 
     @GetMapping("/about")
     public String about() {
-        return "about";   // шаблон about.html
+        return "about";
     }
 }

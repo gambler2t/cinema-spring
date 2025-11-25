@@ -13,25 +13,9 @@
     <nav>
         <a th:href="@{/movies}">Movies</a>
         <a th:href="@{/about}">О кинотеатре</a>
-
-        <span th:if="${#authorization.expression('hasRole(''USER''))}">
-            <a th:href="@{/user/profile}">Профиль</a>
-        </span>
-
-        <span th:if="${#authorization.expression('hasRole(''ADMIN''))}">
-            <a th:href="@{/admin/movies}">Admin</a>
-        </span>
     </nav>
     <div class="auth">
-        <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
-
-        <span th:if="${#authorization.expression('isAuthenticated()')}">
-            <span th:text="${#authentication.name}">user</span>
-            <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
-            </form>
-        </span>
+        <a th:href="@{/login}">Login</a>
     </div>
 </header>
 
@@ -39,52 +23,88 @@
     <section class="auth-card">
         <h1 class="auth-title">Регистрация</h1>
         <p class="auth-subtitle">
-            Создайте аккаунт, чтобы бронировать билеты, добавлять фильмы в избранное и вести историю посещений.
+            Создайте аккаунт, чтобы покупать билеты онлайн, следить за историей и
+            добавлять фильмы в избранное.
         </p>
 
-        <!-- Общее сообщение об ошибках (если в контроллере что-то кладёшь в model.addAttribute("error", ...)) -->
-        <p class="form-error" th:if="${error}" th:text="${error}"></p>
-        <p class="form-error" th:if="${#fields.hasErrors('*')}">
-            Проверьте правильность заполнения полей.
-        </p>
+        <!-- th:object ДОЛЖЕН быть registrationForm -->
+        <form th:action="@{/register}"
+              th:object="${registrationForm}"
+              method="post"
+              novalidate>
 
-        <!-- Важно: здесь предполагается, что в контроллере модель называется "registrationForm" -->
-        <form th:action="@{/register}" th:object="${registrationForm}" method="post">
+            <!-- Логин -->
             <div class="form-group">
-                <label for="username">Имя пользователя</label>
-                <input id="username" type="text" th:field="*{username}" required>
+                <label for="username">Логин</label>
+                <input id="username"
+                       type="text"
+                       th:field="*{username}"
+                       autocomplete="username"
+                       required>
+                <p class="form-error"
+                   th:if="${#fields.hasErrors('username')}"
+                   th:errors="*{username}">Ошибка логина</p>
             </div>
 
+            <!-- Полное имя -->
             <div class="form-group">
                 <label for="fullName">Полное имя</label>
-                <input id="fullName" type="text" th:field="*{fullName}">
+                <input id="fullName"
+                       type="text"
+                       th:field="*{fullName}">
+                <p class="form-error"
+                   th:if="${#fields.hasErrors('fullName')}"
+                   th:errors="*{fullName}">Ошибка имени</p>
             </div>
 
+            <!-- Email -->
             <div class="form-group">
                 <label for="email">Email</label>
-                <input id="email" type="email" th:field="*{email}">
+                <input id="email"
+                       type="email"
+                       th:field="*{email}"
+                       autocomplete="email">
+                <p class="form-error"
+                   th:if="${#fields.hasErrors('email')}"
+                   th:errors="*{email}">Ошибка email</p>
             </div>
 
+            <!-- Пароль -->
             <div class="form-group">
                 <label for="password">Пароль</label>
-                <input id="password" type="password" th:field="*{password}" required>
+                <input id="password"
+                       type="password"
+                       th:field="*{password}"
+                       autocomplete="new-password"
+                       required>
+                <p class="form-error"
+                   th:if="${#fields.hasErrors('password')}"
+                   th:errors="*{password}">Ошибка пароля</p>
             </div>
 
+            <!-- Повтор пароля -->
             <div class="form-group">
                 <label for="confirmPassword">Повторите пароль</label>
-                <input id="confirmPassword" type="password" th:field="*{confirmPassword}" required>
+                <input id="confirmPassword"
+                       type="password"
+                       th:field="*{confirmPassword}"
+                       autocomplete="new-password"
+                       required>
+                <p class="form-error"
+                   th:if="${#fields.hasErrors('confirmPassword')}"
+                   th:errors="*{confirmPassword}">Ошибка подтверждения</p>
             </div>
 
             <div class="auth-actions">
                 <button type="submit" class="btn btn-primary btn-full">
-                    Зарегистрироваться
+                    Создать аккаунт
                 </button>
             </div>
         </form>
 
         <div class="auth-secondary" style="margin-top: 12px;">
             Уже есть аккаунт?
-            <a th:href="@{/login}">Войти</a>
+            <a th:href="@{/login}">Войдите</a>
         </div>
     </section>
 </main>

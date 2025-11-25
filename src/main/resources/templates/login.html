@@ -10,22 +10,28 @@
     <div class="brand">
         <a th:href="@{/}">Cinema</a>
     </div>
+
     <nav>
         <a th:href="@{/movies}">Movies</a>
         <a th:href="@{/about}">О кинотеатре</a>
 
-        <span th:if="${#authorization.expression('hasRole(''USER''))}">
+        <!-- Пункт "Профиль" — только для авторизованного USER -->
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
         </span>
 
-        <span th:if="${#authorization.expression('hasRole(''ADMIN''))}">
+        <!-- Пункт "Admin" — только для ADMIN -->
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
             <a th:href="@{/admin/movies}">Admin</a>
         </span>
     </nav>
+
     <div class="auth">
+        <!-- Ссылка "Login" только для гостя -->
         <a th:if="${#authorization.expression('isAnonymous()')}"
            th:href="@{/login}">Login</a>
 
+        <!-- Имя + Logout для авторизованного -->
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
@@ -39,20 +45,26 @@
     <section class="auth-card">
         <h1 class="auth-title">Вход</h1>
         <p class="auth-subtitle">
-            Войдите, чтобы покупать билеты онлайн, видеть историю посещений и управлять избранными фильмами.
+            Войдите, чтобы покупать билеты онлайн, видеть историю посещений
+            и управлять избранными фильмами.
         </p>
 
-        <!-- Сообщения об ошибке / выходе -->
+        <!-- Сообщения об ошибках / выходе -->
         <p class="form-error" th:if="${param.error}">
             Неверное имя пользователя или пароль.
         </p>
         <p class="form-error" th:if="${param.logout}">
             Вы вышли из аккаунта.
         </p>
+        <p class="form-success" th:if="${param.registered}">
+            Регистрация прошла успешно, теперь вы можете войти.
+        </p>
 
-        <form th:action="@{/login}" method="post">
+        <!-- ВАЖНО: action должен совпадать с loginProcessingUrl в SecurityConfig -->
+        <!-- Если в SecurityConfig стоит .loginProcessingUrl("/process-login"), то здесь /process-login -->
+        <form th:action="@{/process-login}" method="post">
             <div class="form-group">
-                <label for="username">Имя пользователя</label>
+                <label for="username">Логин</label>
                 <input id="username"
                        type="text"
                        name="username"

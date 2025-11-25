@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,50 +26,21 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        // ОТКРЫТЫЕ СТРАНИЦЫ (видны всем)
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/register",
-                                "/about",
-                                "/movies/**",
-                                "/screenings/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/posters/**",
-                                "/h2-console/**"
-                        ).permitAll()
-
-                        // админка только для ADMIN
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-
-                        // личный кабинет и билеты – только для USER
-                        .requestMatchers("/tickets/**", "/user/**").hasRole("USER")
-
-                        // всё остальное – только после логина
-                        .anyRequest().authenticated()
+                        // пока РАЗРЕШАЕМ ВСЁ (чтобы точно не было циклов редиректов)
+                        .requestMatchers("/**").permitAll()
                 )
-
-                // ЛОГИН
                 .formLogin(form -> form
-                        .loginPage("/login")          // своя страница логина
-                        .loginProcessingUrl("/login") // POST /login обрабатывает Spring Security
+                        .loginPage("/login")          // GET /login — наша страница
+                        .loginProcessingUrl("/process-login") // POST /process-login — обрабатывает Spring Security
+                        .defaultSuccessUrl("/movies", true)
                         .permitAll()
-                        .defaultSuccessUrl("/movies", true) // после удачного логина → /movies
                 )
-
-                // ЛОГАУТ
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/movies")
                         .permitAll()
                 )
-
-                // CSRF выключаем для простоты
-                .csrf(AbstractHttpConfigurer::disable)
-
-                // чтобы работала H2-консоль
+                .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())
                 );
@@ -78,14 +48,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // как искать пользователя в БД
     @Bean
     public UserDetailsService userDetailsService(AppUserRepository userRepository) {
         return username -> {
             AppUser user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-            // ВАЖНО: тип именно List<SimpleGrantedAuthority>, никакого GrantedAuthority
             List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .toList();
@@ -93,7 +61,7 @@ public class SecurityConfig {
             return new org.springframework.security.core.userdetails.User(
                     user.getUsername(),
                     user.getPassword(),
-                    authorities      // подходит, т.к. это Collection<? extends GrantedAuthority>
+                    authorities
             );
         };
     }
