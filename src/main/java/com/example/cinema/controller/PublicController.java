@@ -14,6 +14,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
+import java.security.Principal;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.example.cinema.domain.AppUser;
+import com.example.cinema.repo.AppUserRepository;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -106,7 +113,10 @@ public class PublicController {
 
     @GetMapping("/movies")
     public String moviesList(@RequestParam(value = "q", required = false) String query,
-                             Model model) {
+                             Model model,
+                             Principal principal) {
+
+        // поиск фильмов
         List<Movie> movies;
         if (query != null && !query.isBlank()) {
             movies = movieRepository.findByTitleContainingIgnoreCase(query);
@@ -115,8 +125,23 @@ public class PublicController {
         }
         model.addAttribute("movies", movies);
         model.addAttribute("query", query);
+
+        // избранные фильмы текущего пользователя
+        if (principal != null) {
+            AppUser user = userRepository.findByUsername(principal.getName())
+                    .orElse(null);
+
+            if (user != null && user.getFavoriteMovies() != null) {
+                Set<Long> favoriteIds = user.getFavoriteMovies().stream()
+                        .map(Movie::getId)
+                        .collect(Collectors.toSet());
+                model.addAttribute("favoriteIds", favoriteIds);
+            }
+        }
+
         return "movies/list";
     }
+
 
     @GetMapping("/screenings")
     public String screeningsList(Model model) {
@@ -129,7 +154,8 @@ public class PublicController {
     public String movieDetails(@PathVariable Long id,
                                @RequestParam(value = "date", required = false)
                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                               Model model) {
+                               Model model,
+                               java.security.Principal principal) {
 
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + id));
@@ -171,10 +197,19 @@ public class PublicController {
             screeningsForDay = List.of();
         }
 
+        boolean isFavorite = false;
+        if (principal != null) {
+            AppUser user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null && user.getFavoriteMovies().contains(movie)) {
+                isFavorite = true;
+            }
+        }
+
         model.addAttribute("movie", movie);
         model.addAttribute("availableDates", dates);
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("screeningsForDay", screeningsForDay);
+        model.addAttribute("isFavorite", isFavorite);
 
         return "movies/details";
     }

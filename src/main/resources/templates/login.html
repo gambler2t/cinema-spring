@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <title>Вход</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -13,41 +13,80 @@
     <nav>
         <a th:href="@{/movies}">Movies</a>
         <a th:href="@{/about}">О кинотеатре</a>
+
+        <span th:if="${#authorization.expression('hasRole(''USER''))}">
+            <a th:href="@{/user/profile}">Профиль</a>
+        </span>
+
+        <span th:if="${#authorization.expression('hasRole(''ADMIN''))}">
+            <a th:href="@{/admin/movies}">Admin</a>
+        </span>
     </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Login</a>
+
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        </span>
+    </div>
 </header>
 
-<main class="container">
-    <h1>Login</h1>
+<main class="auth-page">
+    <section class="auth-card">
+        <h1 class="auth-title">Вход</h1>
+        <p class="auth-subtitle">
+            Войдите, чтобы покупать билеты онлайн, видеть историю посещений и управлять избранными фильмами.
+        </p>
 
-    <!-- Сообщения от Spring Security -->
-    <div th:if="${param.error}" style="color: #b91c1c; margin-bottom: 10px;">
-        Invalid username or password.
-    </div>
-    <div th:if="${param.logout}" style="color: #047857; margin-bottom: 10px;">
-        You have been logged out.
-    </div>
+        <!-- Сообщения об ошибке / выходе -->
+        <p class="form-error" th:if="${param.error}">
+            Неверное имя пользователя или пароль.
+        </p>
+        <p class="form-error" th:if="${param.logout}">
+            Вы вышли из аккаунта.
+        </p>
 
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label>Username:<br>
-                <input type="text" name="username">
-            </label>
-        </div>
-        <div style="margin-top:10px;">
-            <label>Password:<br>
-                <input type="password" name="password">
-            </label>
-        </div>
-        <div style="margin-top:16px;">
-            <button type="submit" class="btn btn-primary">Log in</button>
-        </div>
-    </form>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input id="username"
+                       type="text"
+                       name="username"
+                       autocomplete="username"
+                       required>
+            </div>
 
-    <p style="margin-top:16px;">
-        Test users:<br>
-        <strong>admin / admin</strong> (ADMIN + USER)<br>
-        <strong>user / user</strong> (USER)
-    </p>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input id="password"
+                       type="password"
+                       name="password"
+                       autocomplete="current-password"
+                       required>
+            </div>
+
+            <div class="auth-actions">
+                <button type="submit" class="btn btn-primary btn-full">
+                    Войти
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-secondary" style="margin-top: 12px;">
+            Нет аккаунта?
+            <a th:href="@{/register}">Зарегистрируйтесь</a>
+        </div>
+
+        <p class="auth-secondary" style="margin-top: 12px;">
+            Тестовые пользователи:<br>
+            <strong>admin / admin</strong> (ADMIN + USER)<br>
+            <strong>user / user</strong> (USER)
+        </p>
+    </section>
 </main>
 
 </body>

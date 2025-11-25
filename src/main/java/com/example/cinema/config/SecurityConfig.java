@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,11 +26,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // CSRF выключаем, чтобы не мучиться с токенами в форме логина (для учебного проекта ок)
-                .csrf(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(auth -> auth
-                        // открыто всем (гости тоже видят фильмы и логин)
+                        // ОТКРЫТЫЕ СТРАНИЦЫ (видны всем)
                         .requestMatchers(
                                 "/",
                                 "/login",
@@ -40,6 +36,7 @@ public class SecurityConfig {
                                 "/movies/**",
                                 "/screenings/**",
                                 "/css/**",
+                                "/js/**",
                                 "/images/**",
                                 "/posters/**",
                                 "/h2-console/**"
@@ -48,27 +45,32 @@ public class SecurityConfig {
                         // админка только для ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // билеты и профиль только для USER
+                        // личный кабинет и билеты – только для USER
                         .requestMatchers("/tickets/**", "/user/**").hasRole("USER")
 
-                        // всё остальное требует входа
+                        // всё остальное – только после логина
                         .anyRequest().authenticated()
                 )
 
+                // ЛОГИН
                 .formLogin(form -> form
-                        .loginPage("/login")          // наш login.html
+                        .loginPage("/login")          // своя страница логина
                         .loginProcessingUrl("/login") // POST /login обрабатывает Spring Security
-                        .defaultSuccessUrl("/", true) // после успешного логина → на главную (/ → /movies)
                         .permitAll()
+                        .defaultSuccessUrl("/movies", true) // после удачного логина → /movies
                 )
 
+                // ЛОГАУТ
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/movies")
                         .permitAll()
                 )
 
-                // чтобы открывалась H2-console в iframe
+                // CSRF выключаем для простоты
+                .csrf(AbstractHttpConfigurer::disable)
+
+                // чтобы работала H2-консоль
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())
                 );
@@ -76,14 +78,14 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Говорим Spring Security, как искать пользователя в БД
+    // как искать пользователя в БД
     @Bean
     public UserDetailsService userDetailsService(AppUserRepository userRepository) {
         return username -> {
             AppUser user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-            // здесь исправление: тип списка = List<SimpleGrantedAuthority>
+            // ВАЖНО: тип именно List<SimpleGrantedAuthority>, никакого GrantedAuthority
             List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .toList();
@@ -91,11 +93,10 @@ public class SecurityConfig {
             return new org.springframework.security.core.userdetails.User(
                     user.getUsername(),
                     user.getPassword(),
-                    authorities   // это Collection<? extends GrantedAuthority>
+                    authorities      // подходит, т.к. это Collection<? extends GrantedAuthority>
             );
         };
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

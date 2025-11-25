@@ -12,7 +12,7 @@
         <a th:href="@{/movies}">Movies</a>
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
-            <a th:href="@{/user/profile}">My tickets</a>
+            <a th:href="@{/user/profile}">Профиль</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
             <a th:href="@{/admin/movies}">Admin</a>
@@ -41,15 +41,37 @@
         <div class="movie-hero-info">
             <h1 th:text="*{title}">Title</h1>
 
+            <div class="movie-hero-actions">
+                <form th:if="${#authorization.expression('hasRole(''USER'')')}"
+                      th:action="@{/user/favorites/{id}/toggle(id=*{id})}"
+                      method="post"
+                      class="inline">
+
+                    <button type="submit"
+                            class="btn btn-secondary btn-small"
+                            th:text="${isFavorite} ? 'Убрать из избранного' : 'В избранное'">
+                        В избранное
+                    </button>
+                </form>
+            </div>
+
             <p><strong>Genre:</strong>
-                <span th:text="*{genre}">Genre</span></p>
+                <span th:text="*{genre}">Genre</span>
+            </p>
+
             <p><strong>Director:</strong>
-                <span th:text="*{director}">Director</span></p>
+                <span th:text="*{director}">Director</span>
+            </p>
+
             <p><strong>Country:</strong>
-                <span th:text="*{country}">Country</span></p>
+                <span th:text="*{country}">Country</span>
+            </p>
+
             <p><strong>Duration:</strong>
-                <span th:text="*{durationMinutes}">120</span> min</p>
+                <span th:text="*{durationMinutes}">120</span> min
+            </p>
         </div>
+
     </section>
     <section class="movie-description">
         <h2>Description</h2>
