@@ -2,50 +2,39 @@ package com.example.cinema.controller.admin;
 
 import com.example.cinema.domain.Movie;
 import com.example.cinema.repo.MovieRepository;
+import com.example.cinema.service.PosterStorageService;
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/admin/movies")
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminMovieController {
 
     private final MovieRepository movieRepository;
+    private final PosterStorageService posterStorageService;
 
-    public AdminMovieController(MovieRepository movieRepository) {
+    public AdminMovieController(MovieRepository movieRepository,
+                                PosterStorageService posterStorageService) {
         this.movieRepository = movieRepository;
+        this.posterStorageService = posterStorageService;
     }
 
-    // список фильмов
     @GetMapping
     public String list(Model model) {
         model.addAttribute("movies", movieRepository.findAll());
         return "admin/movies/list";
     }
 
-    // форма создания
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("movie", new Movie());
         return "admin/movies/form";
     }
 
-    // создание фильма
-    @PostMapping
-    public String create(@Valid @ModelAttribute("movie") Movie movie,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "admin/movies/form";
-        }
-        movieRepository.save(movie);
-        return "redirect:/admin/movies";
-    }
-
-    // форма редактирования
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         Movie movie = movieRepository.findById(id)
@@ -54,20 +43,30 @@ public class AdminMovieController {
         return "admin/movies/form";
     }
 
-    // обновление фильма
-    @PostMapping("/{id}")
-    public String update(@PathVariable Long id,
-                         @Valid @ModelAttribute("movie") Movie movie,
-                         BindingResult bindingResult) {
+    @PostMapping
+    public String save(@Valid @ModelAttribute("movie") Movie movie,
+                       BindingResult bindingResult,
+                       @RequestParam("posterFile") MultipartFile posterFile) {
+
         if (bindingResult.hasErrors()) {
             return "admin/movies/form";
         }
-        movie.setId(id);
+
+        try {
+            // если загрузили новый файл – сохраняем и обновляем posterUrl
+            if (posterFile != null && !posterFile.isEmpty()) {
+                String url = posterStorageService.store(posterFile);
+                movie.setPosterUrl(url);
+            }
+        } catch (Exception e) {
+            bindingResult.reject("posterFile", "Failed to upload poster: " + e.getMessage());
+            return "admin/movies/form";
+        }
+
         movieRepository.save(movie);
         return "redirect:/admin/movies";
     }
 
-    // удаление
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         movieRepository.deleteById(id);

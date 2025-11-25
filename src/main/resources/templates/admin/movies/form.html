@@ -1,43 +1,99 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Movie form</title>
+    <title th:text="${movie.id} == null ? 'Create movie' : 'Edit movie'">Movie</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<h1 th:text="${movie.id == null} ? 'New movie' : 'Edit movie'">Movie form</h1>
 
-<form th:action="${movie.id == null} ? @{/admin/movies} : @{|/admin/movies/${movie.id}|}"
-      th:object="${movie}"
-      method="post">
-
-    <div>
-        <label>Title:
-            <input type="text" th:field="*{title}">
-        </label>
-        <div th:if="${#fields.hasErrors('title')}"
-             th:errors="*{title}">Error</div>
+<header class="topbar">
+    <div class="brand"><a th:href="@{/}">Cinema</a></div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/admin/movies}">Admin: Movies</a>
+        <a th:href="@{/admin/screenings}">Admin: Screenings</a>
+    </nav>
+    <div class="auth">
+        <span th:text="${#authentication.name}">admin</span>
+        <form th:action="@{/logout}" method="post" class="inline">
+            <button type="submit" class="link-button">Logout</button>
+        </form>
     </div>
+</header>
 
-    <div>
-        <label>Duration (minutes):
-            <input type="number" th:field="*{durationMinutes}">
-        </label>
-        <div th:if="${#fields.hasErrors('durationMinutes')}"
-             th:errors="*{durationMinutes}">Error</div>
+<main class="container movie-details">
+    <h1 th:text="${movie.id} == null ? 'Create movie' : 'Edit movie'">Movie</h1>
+
+    <div class="movie-hero">
+        <div class="movie-hero-poster">
+            <img th:if="${movie.posterUrl != null and !movie.posterUrl.isBlank()}"
+                 th:src="${movie.posterUrl}"
+                 alt="Poster preview">
+            <div th:if="${movie.posterUrl == null or movie.posterUrl.isBlank()}"
+                 class="movie-poster-placeholder">
+                NO POSTER
+            </div>
+        </div>
+
+        <div class="movie-hero-info">
+            <form th:action="@{/admin/movies}"
+                  th:object="${movie}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" th:field="*{id}"/>
+                <!-- сохраняем старый URL, если файл не загружаем -->
+                <input type="hidden" th:field="*{posterUrl}"/>
+
+                <div style="margin-bottom:10px;">
+                    <label>Title<br>
+                        <input type="text" th:field="*{title}" style="width: 100%;">
+                    </label>
+                    <div th:if="${#fields.hasErrors('title')}"
+                         th:errors="*{title}" style="color:red;"></div>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-bottom:10px;">
+                    <label style="flex:1;">Genre<br>
+                        <input type="text" th:field="*{genre}" style="width: 100%;">
+                    </label>
+                    <label style="flex:1;">Director<br>
+                        <input type="text" th:field="*{director}" style="width: 100%;">
+                    </label>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-bottom:10px;">
+                    <label style="flex:1;">Country<br>
+                        <input type="text" th:field="*{country}" style="width: 100%;">
+                    </label>
+                    <label style="width:140px;">Duration (min)<br>
+                        <input type="number" min="1" th:field="*{durationMinutes}" style="width: 100%;">
+                    </label>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Poster image (upload)<br>
+                        <input type="file" name="posterFile" accept="image/*">
+                    </label>
+                    <p style="font-size:12px; color:#6b7280;">
+                        Оставь поле пустым, если не хочешь менять постер.
+                    </p>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Description<br>
+                        <textarea th:field="*{description}" rows="5" style="width: 100%;"></textarea>
+                    </label>
+                </div>
+
+                <div style="margin-top:16px;">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a th:href="@{/admin/movies}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div>
-        <label>Description:
-            <textarea th:field="*{description}" rows="4"></textarea>
-        </label>
-    </div>
-
-    <button type="submit">Save</button>
-</form>
-
-<p>
-    <a th:href="@{/admin/movies}">Back to list</a>
-</p>
+</main>
 
 </body>
 </html>

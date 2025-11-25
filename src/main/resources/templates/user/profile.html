@@ -36,6 +36,7 @@
     <h1>My tickets</h1>
 
     <table>
+        <thead>
         <tr>
             <th>#</th>
             <th>Movie</th>
@@ -43,18 +44,33 @@
             <th>Hall</th>
             <th>Seat</th>
             <th>Name</th>
+            <th>Actions</th>
         </tr>
+        </thead>
+        <tbody>
         <tr th:each="t, idx : ${tickets}">
             <td th:text="${idx.index + 1}">1</td>
             <td th:text="${t.screening.movie.title}">Movie</td>
-            <td th:text="${t.screening.startTime}">Time</td>
+            <td th:text="${#temporals.format(t.screening.startTime, 'yyyy-MM-dd HH:mm')}">Time</td>
             <td th:text="${t.screening.hall}">Hall</td>
             <td th:text="${t.seat}">A1</td>
             <td th:text="${t.customerName}">Name</td>
+            <td>
+                <form th:action="@{|/user/tickets/${t.id}/delete|}"
+                      method="post"
+                      class="inline"
+                      onsubmit="return confirm('Cancel this ticket?');">
+                    <button type="submit" class="btn btn-secondary btn-small">
+                        Cancel
+                    </button>
+                </form>
+            </td>
         </tr>
+
         <tr th:if="${#lists.isEmpty(tickets)}">
-            <td colspan="6">You have no tickets yet.</td>
+            <td colspan="7">You have no tickets yet.</td>
         </tr>
+        </tbody>
     </table>
 </main>
 

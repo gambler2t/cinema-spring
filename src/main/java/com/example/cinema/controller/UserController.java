@@ -7,6 +7,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.example.cinema.domain.Ticket;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.security.Principal;
+
 
 @Controller
 @RequestMapping("/user")
@@ -26,4 +32,25 @@ public class UserController {
         model.addAttribute("tickets", ticketRepository.findByUser_Username(username));
         return "user/profile";
     }
+
+    @PostMapping("/tickets/{id}/delete")
+    public String deleteTicket(@PathVariable Long id,
+                               Principal principal) {
+
+        // ищем билет
+        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        if (ticket != null && ticket.getUser() != null) {
+
+            String currentUser = principal.getName();
+
+            // удалять можно только свои билеты
+            if (currentUser.equals(ticket.getUser().getUsername())) {
+                ticketRepository.delete(ticket);
+            }
+        }
+
+        // возвращаемся на страницу "My tickets"
+        return "redirect:/user/profile";
+    }
+
 }

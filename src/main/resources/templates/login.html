@@ -12,29 +12,19 @@
     </div>
     <nav>
         <a th:href="@{/movies}">Movies</a>
-        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
-            <a th:href="@{/user/profile}">My tickets</a>
-        </span>
-        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin</a>
-        </span>
     </nav>
-    <div class="auth">
-        <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
-
-        <span th:if="${#authorization.expression('isAuthenticated()')}">
-            <span th:text="${#authentication.name}">user</span>
-            <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
-            </form>
-        </span>
-    </div>
 </header>
-
 
 <main class="container">
     <h1>Login</h1>
+
+    <!-- Сообщения от Spring Security -->
+    <div th:if="${param.error}" style="color: #b91c1c; margin-bottom: 10px;">
+        Invalid username or password.
+    </div>
+    <div th:if="${param.logout}" style="color: #047857; margin-bottom: 10px;">
+        You have been logged out.
+    </div>
 
     <form th:action="@{/login}" method="post">
         <div>

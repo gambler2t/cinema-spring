@@ -388,3 +388,158 @@ form.inline {
         padding: 16px;
     }
 }
+
+.date-tabs {
+    margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.date-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    font-size: 13px;
+    color: #374151;
+}
+
+.date-chip:hover {
+    background-color: #e5e7eb;
+}
+
+.date-chip.active {
+    background-color: #ec4899;
+    border-color: #ec4899;
+    color: #f9fafb;
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+/* ----- Date chips над таблицей ----- */
+
+.date-tabs {
+    margin: 14px 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.date-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.date-chip-day {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.date-chip-weekday {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.date-chip:hover {
+    background-color: #eef2ff;
+    border-color: #c7d2fe;
+}
+
+.date-chip.active {
+    background: linear-gradient(to right, #ec4899, #8b5cf6);
+    border-color: transparent;
+    color: #f9fafb;
+    box-shadow: 0 8px 18px rgba(236, 72, 153, 0.4);
+}
+
+.date-chip.active .date-chip-weekday {
+    color: #f9fafb;
+}
+
+/* ----- Таблица сеансов ----- */
+
+.screenings-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.screenings-table th {
+    border: none;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+    background: transparent;
+}
+
+.screenings-table td {
+    border: none;
+    background-color: #f9fafb;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.screenings-table tbody tr:hover td {
+    background-color: #eef2ff;
+}
+
+/* закруглим "карточку" ряда */
+.screenings-table tbody tr td:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.screenings-table tbody tr td:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+/* ----- Время и цена ----- */
+
+.time-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background-color: #111827;
+    color: #f9fafb;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+}
+
+.price-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background-color: #ecfdf5;
+    color: #047857;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* уже был, но вдруг — для кнопки "Buy ticket" поменьше */
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+

@@ -1,38 +1,69 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Movies admin</title>
+    <title>Admin: Movies</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<h1>Movies (admin)</h1>
 
-<p>
-    <a th:href="@{/}">Back to main site</a>
-</p>
+<header class="topbar">
+    <div class="brand"><a th:href="@{/}">Cinema</a></div>
+    <nav>
+        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/admin/movies}">Admin: Movies</a>
+        <a th:href="@{/admin/screenings}">Admin: Screenings</a>
+    </nav>
+    <div class="auth">
+        <span th:text="${#authentication.name}">admin</span>
+        <form th:action="@{/logout}" method="post" class="inline">
+            <button type="submit" class="link-button">Logout</button>
+        </form>
+    </div>
+</header>
 
-<p>
-    <a th:href="@{/admin/movies/new}">Add movie</a>
-</p>
+<main class="container">
+    <h1>Movies (admin)</h1>
 
-<table border="1" cellpadding="4">
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Duration</th>
-        <th>Actions</th>
-    </tr>
-    <tr th:each="m : ${movies}">
-        <td th:text="${m.id}">1</td>
-        <td th:text="${m.title}">Title</td>
-        <td th:text="${m.durationMinutes}">120</td>
-        <td>
-            <a th:href="@{|/admin/movies/${m.id}/edit|}">Edit</a>
-            <form th:action="@{|/admin/movies/${m.id}/delete|}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-</table>
+    <p>
+        <a th:href="@{/admin/movies/new}" class="btn btn-primary">Add movie</a>
+    </p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Poster</th>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Duration</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${movies}">
+            <td style="width:80px;">
+                <img th:if="${m.posterUrl != null and !m.posterUrl.isBlank()}"
+                     th:src="${m.posterUrl}"
+                     alt="poster"
+                     style="width:60px; height:80px; object-fit:cover; border-radius:4px;">
+            </td>
+            <td th:text="${m.title}">Title</td>
+            <td th:text="${m.genre}">Genre</td>
+            <td>
+                <span th:text="${m.durationMinutes}">120</span> min
+            </td>
+            <td>
+                <a th:href="@{|/admin/movies/${m.id}/edit|}">Edit</a>
+                |
+                <form th:action="@{|/admin/movies/${m.id}/delete|}"
+                      method="post" class="inline"
+                      onsubmit="return confirm('Delete this movie?');">
+                    <button type="submit" class="link-button">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
 
 </body>
 </html>

@@ -41,28 +41,16 @@
         <div class="movie-hero-info">
             <h1 th:text="*{title}">Title</h1>
 
-            <p><strong>Genre:</strong> <span th:text="*{genre}">Genre</span></p>
-            <p><strong>Director:</strong> <span th:text="*{director}">Director</span></p>
-            <p><strong>Country:</strong> <span th:text="*{country}">Country</span></p>
+            <p><strong>Genre:</strong>
+                <span th:text="*{genre}">Genre</span></p>
+            <p><strong>Director:</strong>
+                <span th:text="*{director}">Director</span></p>
+            <p><strong>Country:</strong>
+                <span th:text="*{country}">Country</span></p>
             <p><strong>Duration:</strong>
-                <span th:text="*{durationMinutes}">120</span> min
-            </p>
-
-            <div class="movie-hero-actions">
-                <a th:if="${#authorization.expression('hasRole(''USER'')')}"
-                   th:href="@{/screenings}"
-                   class="btn btn-primary">
-                    Go to screenings
-                </a>
-                <a th:if="${#authorization.expression('isAnonymous()')}"
-                   th:href="@{/login}"
-                   class="btn btn-primary">
-                    Login to buy ticket
-                </a>
-            </div>
+                <span th:text="*{durationMinutes}">120</span> min</p>
         </div>
     </section>
-
     <section class="movie-description">
         <h2>Description</h2>
         <p th:text="*{description}">
@@ -72,32 +60,67 @@
 
     <section class="movie-screenings">
         <h2>Upcoming screenings</h2>
-        <table>
-            <tr>
-                <th>Start time</th>
-                <th>Hall</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-            <tr th:each="s : ${screenings}">
-                <td th:text="${s.startTime}">2025-01-01T19:00</td>
-                <td th:text="${s.hall}">Hall 1</td>
-                <td th:text="${s.price}">9.99</td>
-                <td>
-                    <a th:if="${#authorization.expression('hasRole(''USER'')')}"
-                       th:href="@{|/tickets/book/${s.id}|}"
-                       class="btn btn-primary">
-                        Buy ticket
-                    </a>
-                    <a th:if="${#authorization.expression('isAnonymous()')}"
-                       th:href="@{/login}">
-                        Login to buy
-                    </a>
-                </td>
-            </tr>
-        </table>
-    </section>
-</main>
 
+        <!-- если вообще нет сеансов -->
+        <div th:if="${#lists.isEmpty(availableDates)}">
+            <p>There are no upcoming screenings for this movie yet.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(availableDates)}">
+            <!-- вкладки с датами -->
+            <div class="date-tabs">
+                <a th:each="d : ${availableDates}"
+                   th:href="@{|/movies/${movie.id}?date=${d}|}"
+                   th:class="'date-chip' + (${d} == ${selectedDate} ? ' active' : '')">
+
+                <span class="date-chip-day"
+                      th:text="${#temporals.format(d, 'dd MMM')}">19 Nov</span>
+                    <span class="date-chip-weekday"
+                          th:text="${#temporals.format(d, 'EEE')}">Tue</span>
+                </a>
+            </div>
+
+            <table class="screenings-table">
+                <thead>
+                <tr>
+                    <th>Start time</th>
+                    <th>Hall</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${screeningsForDay}">
+                    <td>
+                    <span class="time-chip"
+                          th:text="${#temporals.format(s.startTime, 'HH:mm')}">
+                        19:00
+                    </span>
+                    </td>
+                    <td th:text="${s.hall}">Hall 1</td>
+                    <td>
+                    <span class="price-chip"
+                          th:text="${s.price + ' ₽'}">
+                        10.00 ₽
+                    </span>
+                    </td>
+                    <td>
+                        <a th:if="${#authorization.expression('hasRole(''USER'')')}"
+                           th:href="@{|/tickets/book/${s.id}|}"
+                           class="btn btn-primary btn-small">
+                            Buy ticket
+                        </a>
+                        <a th:if="${#authorization.expression('isAnonymous()')}"
+                           th:href="@{/login}">
+                            Login to buy
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
 </body>
 </html>
