@@ -1,62 +1,39 @@
 package com.example.cinema.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 
 @Entity
-@Table(name = "movies")
 public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    // Название фильма
     private String title;
 
+    // Жанр
+    private String genre;
+
+    // Описание
     @Column(length = 2000)
     private String description;
 
-    @Positive
-    private int durationMinutes;
+    // Длительность в минутах
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
 
-    // новые поля
-    private String genre;
+    // Режиссёр
     private String director;
+
+    // Страна
     private String country;
 
-    // URL постера (внешняя ссылка или /images/...)
+    // URL постера
+    @Column(name = "poster_url")
     private String posterUrl;
 
-    public Movie() {
-    }
-
-    // старый конструктор — оставляем, чтобы всё, что уже вызывал его, продолжало работать
-    public Movie(String title, String description, int durationMinutes) {
-        this.title = title;
-        this.description = description;
-        this.durationMinutes = durationMinutes;
-    }
-
-    // при желании можно использовать и этот конструктор
-    public Movie(String title,
-                 String description,
-                 int durationMinutes,
-                 String genre,
-                 String director,
-                 String country,
-                 String posterUrl) {
-        this.title = title;
-        this.description = description;
-        this.durationMinutes = durationMinutes;
-        this.genre = genre;
-        this.director = director;
-        this.country = country;
-        this.posterUrl = posterUrl;
-    }
-
-    // getters / setters
+    // ===== getters / setters =====
 
     public Long getId() {
         return id;
@@ -74,6 +51,14 @@ public class Movie {
         this.title = title;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -82,20 +67,12 @@ public class Movie {
         this.description = description;
     }
 
-    public int getDurationMinutes() {
+    public Integer getDurationMinutes() {
         return durationMinutes;
     }
 
-    public void setDurationMinutes(int durationMinutes) {
+    public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
     }
 
     public String getDirector() {

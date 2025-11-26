@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${movie.title}">Movie</title>
+    <title th:text="${movie.title}">Фильм</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -9,22 +9,22 @@
 <header class="topbar">
     <div class="brand"><a th:href="@{/}">Cinema</a></div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin</a>
+            <a th:href="@{/admin/movies}">Админ</a>
         </span>
     </nav>
     <div class="auth">
         <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
+           th:href="@{/login}">Войти</a>
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
+                <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
     </div>
@@ -35,11 +35,11 @@
         <div class="movie-hero-poster">
             <img th:if="*{posterUrl != null}" th:src="*{posterUrl}" alt="Poster">
             <div th:if="*{posterUrl == null}" class="movie-poster-placeholder">
-                NO POSTER
+                НЕТ ПОСТЕРА
             </div>
         </div>
         <div class="movie-hero-info">
-            <h1 th:text="*{title}">Title</h1>
+            <h1 th:text="*{title}">Название</h1>
 
             <div class="movie-hero-actions">
                 <form th:if="${#authorization.expression('hasRole(''USER'')')}"
@@ -55,94 +55,32 @@
                 </form>
             </div>
 
-            <p><strong>Genre:</strong>
-                <span th:text="*{genre}">Genre</span>
+            <p><strong>Жанр:</strong>
+                <span th:text="*{genre}">Жанр</span>
             </p>
 
-            <p><strong>Director:</strong>
-                <span th:text="*{director}">Director</span>
+            <p><strong>Режиссёр:</strong>
+                <span th:text="*{director}">Режиссёр</span>
             </p>
 
-            <p><strong>Country:</strong>
-                <span th:text="*{country}">Country</span>
+            <p><strong>Страна:</strong>
+                <span th:text="*{country}">Страна</span>
             </p>
 
-            <p><strong>Duration:</strong>
-                <span th:text="*{durationMinutes}">120</span> min
+            <p><strong>Длительность:</strong>
+                <span th:text="*{durationMinutes != null ? durationMinutes : '—'}">120</span> мин
             </p>
         </div>
 
     </section>
     <section class="movie-description">
-        <h2>Description</h2>
+        <h2>Описание</h2>
         <p th:text="*{description}">
-            Long description...
+            Описание фильма...
         </p>
     </section>
 
-    <section class="movie-screenings">
-        <h2>Upcoming screenings</h2>
-
-        <!-- если вообще нет сеансов -->
-        <div th:if="${#lists.isEmpty(availableDates)}">
-            <p>There are no upcoming screenings for this movie yet.</p>
-        </div>
-
-        <div th:unless="${#lists.isEmpty(availableDates)}">
-            <!-- вкладки с датами -->
-            <div class="date-tabs">
-                <a th:each="d : ${availableDates}"
-                   th:href="@{|/movies/${movie.id}?date=${d}|}"
-                   th:class="'date-chip' + (${d} == ${selectedDate} ? ' active' : '')">
-
-                <span class="date-chip-day"
-                      th:text="${#temporals.format(d, 'dd MMM')}">19 Nov</span>
-                    <span class="date-chip-weekday"
-                          th:text="${#temporals.format(d, 'EEE')}">Tue</span>
-                </a>
-            </div>
-
-            <table class="screenings-table">
-                <thead>
-                <tr>
-                    <th>Start time</th>
-                    <th>Hall</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="s : ${screeningsForDay}">
-                    <td>
-                    <span class="time-chip"
-                          th:text="${#temporals.format(s.startTime, 'HH:mm')}">
-                        19:00
-                    </span>
-                    </td>
-                    <td th:text="${s.hall}">Hall 1</td>
-                    <td>
-                    <span class="price-chip"
-                          th:text="${s.price + ' ₽'}">
-                        10.00 ₽
-                    </span>
-                    </td>
-                    <td>
-                        <a th:if="${#authorization.expression('hasRole(''USER'')')}"
-                           th:href="@{|/tickets/book/${s.id}|}"
-                           class="btn btn-primary btn-small">
-                            Buy ticket
-                        </a>
-                        <a th:if="${#authorization.expression('isAnonymous()')}"
-                           th:href="@{/login}">
-                            Login to buy
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
+    <!-- дальше можно оставить твой блок с сеансами как есть -->
 </main>
 </body>
 </html>

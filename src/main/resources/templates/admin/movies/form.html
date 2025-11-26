@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${movie.id} == null ? 'Create movie' : 'Edit movie'">Movie</title>
+    <title th:text="${movie.id} == null ? 'Создать фильм' : 'Редактировать фильм'">Фильм</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -9,90 +9,94 @@
 <header class="topbar">
     <div class="brand"><a th:href="@{/}">Cinema</a></div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
         </span>
-        <a th:href="@{/admin/movies}">Admin: Movies</a>
-        <a th:href="@{/admin/screenings}">Admin: Screenings</a>
+        <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+        <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
     </nav>
     <div class="auth">
         <span th:text="${#authentication.name}">admin</span>
         <form th:action="@{/logout}" method="post" class="inline">
-            <button type="submit" class="link-button">Logout</button>
+            <button type="submit" class="link-button">Выйти</button>
         </form>
     </div>
 </header>
 
 <main class="container movie-details">
-    <h1 th:text="${movie.id} == null ? 'Create movie' : 'Edit movie'">Movie</h1>
+    <h1 th:text="${movie.id} == null ? 'Создать фильм' : 'Редактировать фильм'">Фильм</h1>
 
     <div class="movie-hero">
         <div class="movie-hero-poster">
             <img th:if="${movie.posterUrl != null and !movie.posterUrl.isBlank()}"
-                 th:src="${movie.posterUrl}"
-                 alt="Poster preview">
+                 th:src="${movie.posterUrl}" alt="Превью постера">
             <div th:if="${movie.posterUrl == null or movie.posterUrl.isBlank()}"
-                 class="movie-poster-placeholder">
-                NO POSTER
-            </div>
+                 class="movie-poster-placeholder">Нет постера</div>
         </div>
 
         <div class="movie-hero-info">
             <form th:action="@{/admin/movies}"
-                  th:object="${movie}"
-                  method="post"
-                  enctype="multipart/form-data">
+                  th:object="${movie}" method="post" enctype="multipart/form-data">
 
                 <input type="hidden" th:field="*{id}"/>
-                <!-- сохраняем старый URL, если файл не загружаем -->
                 <input type="hidden" th:field="*{posterUrl}"/>
 
                 <div style="margin-bottom:10px;">
-                    <label>Title<br>
-                        <input type="text" th:field="*{title}" style="width: 100%;">
+                    <label>Название<br>
+                        <input type="text" th:field="*{title}" style="width: 100%;" required>
                     </label>
                     <div th:if="${#fields.hasErrors('title')}"
                          th:errors="*{title}" style="color:red;"></div>
                 </div>
 
-                <div style="display:flex; gap:12px; margin-bottom:10px;">
-                    <label style="flex:1;">Genre<br>
-                        <input type="text" th:field="*{genre}" style="width: 100%;">
-                    </label>
-                    <label style="flex:1;">Director<br>
-                        <input type="text" th:field="*{director}" style="width: 100%;">
-                    </label>
-                </div>
-
-                <div style="display:flex; gap:12px; margin-bottom:10px;">
-                    <label style="flex:1;">Country<br>
-                        <input type="text" th:field="*{country}" style="width: 100%;">
-                    </label>
-                    <label style="width:140px;">Duration (min)<br>
-                        <input type="number" min="1" th:field="*{durationMinutes}" style="width: 100%;">
+                <div style="margin-bottom:10px;">
+                    <label>Жанр<br>
+                        <input type="text" th:field="*{genre}" style="width: 100%;" required>
                     </label>
                 </div>
 
                 <div style="margin-bottom:10px;">
-                    <label>Poster image (upload)<br>
+                    <label>Описание<br>
+                        <textarea th:field="*{description}" rows="5"
+                                  style="width: 100%;" required></textarea>
+                    </label>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Длительность (минуты)<br>
+                        <input type="number" th:field="*{durationMinutes}"
+                               min="1" style="width: 100%;" required>
+                    </label>
+                    <div th:if="${#fields.hasErrors('durationMinutes')}"
+                         th:errors="*{durationMinutes}" style="color:red;"></div>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Режиссёр<br>
+                        <input type="text" th:field="*{director}" style="width: 100%;" required>
+                    </label>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Страна<br>
+                        <input type="text" th:field="*{country}" style="width: 100%;" required>
+                    </label>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label>Постер (загрузка)<br>
                         <input type="file" name="posterFile" accept="image/*">
                     </label>
                     <p style="font-size:12px; color:#6b7280;">
-                        Оставь поле пустым, если не хочешь менять постер.
+                        Оставьте пустым, если не хотите менять постер.
                     </p>
                 </div>
 
-                <div style="margin-bottom:10px;">
-                    <label>Description<br>
-                        <textarea th:field="*{description}" rows="5" style="width: 100%;"></textarea>
-                    </label>
-                </div>
-
                 <div style="margin-top:16px;">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a th:href="@{/admin/movies}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a th:href="@{/admin/movies}" class="btn btn-secondary">Отмена</a>
                 </div>
             </form>
         </div>

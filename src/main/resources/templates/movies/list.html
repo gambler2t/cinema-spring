@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Movies</title>
+    <title>Фильмы</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -9,22 +9,22 @@
 <header class="topbar">
     <div class="brand"><a th:href="@{/}">Cinema</a></div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin</a>
+            <a th:href="@{/admin/movies}">Админ</a>
         </span>
     </nav>
     <div class="auth">
         <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
+           th:href="@{/login}">Войти</a>
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
+                <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
     </div>
@@ -44,12 +44,12 @@
 
     <!-- ЦЕНТРАЛЬНАЯ ОБЛАСТЬ С ФИЛЬМАМИ -->
     <section class="container-wide movies-main">
-        <h1>Movies</h1>
+        <h1>Фильмы</h1>
 
         <form class="search-bar" th:action="@{/movies}" method="get">
-            <input type="text" name="q" placeholder="Search by title"
+            <input type="text" name="q" placeholder="Поиск по названию"
                    th:value="${query}">
-            <button type="submit" class="btn btn-secondary">Search</button>
+            <button type="submit" class="btn btn-secondary">Найти</button>
         </form>
 
         <div class="movies-grid">
@@ -59,35 +59,37 @@
                          th:src="${m.posterUrl}"
                          alt="Poster">
                     <div th:if="${m.posterUrl == null}" class="movie-poster-placeholder">
-                        NO POSTER
+                        НЕТ ПОСТЕРА
                     </div>
                 </div>
                 <div class="movie-content">
-                    <h3 th:text="${m.title}">Title</h3>
-                    <p class="movie-genre" th:text="${m.genre}">Genre</p>
+                    <h3 th:text="${m.title}">Название</h3>
+                    <p class="movie-genre" th:text="${m.genre}">Жанр</p>
                     <p class="movie-desc"
                        th:text="${#strings.abbreviate(m.description, 120)}">
-                        Short description
+                        Краткое описание
                     </p>
                 </div>
                 <div class="movie-footer">
-                    <span class="tag" th:text="${movie.durationMinutes + ' min'}">120 min</span>
+                    <span class="tag"
+                          th:text="${m.durationMinutes != null ? m.durationMinutes + ' мин' : '—'}">
+                        120 мин
+                    </span>
 
                     <a class="btn btn-primary"
-                       th:href="@{/movies/{id}(id=${movie.id})}">
-                        Details
+                       th:href="@{/movies/{id}(id=${m.id})}">
+                        Подробнее
                     </a>
 
                     <!-- сердечко только для залогиненного USER -->
                     <form th:if="${#authorization.expression('hasRole(''USER'')')}"
-                          th:action="@{/user/favorites/{id}/toggle(id=${movie.id})}"
+                          th:action="@{/user/favorites/{id}/toggle(id=${m.id})}"
                           method="post"
                           class="favorite-form">
 
                         <button type="submit"
-                                th:class="${favoriteIds != null and favoriteIds.contains(movie.id)} ?
-                           'favorite-btn active' : 'favorite-btn'">
-                            <!-- сердечко -->
+                                th:class="${favoriteIds != null and favoriteIds.contains(m.id)} ?
+                                   'favorite-btn active' : 'favorite-btn'">
                             &#10084;
                         </button>
                     </form>

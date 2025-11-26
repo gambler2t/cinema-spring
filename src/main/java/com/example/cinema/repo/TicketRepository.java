@@ -12,4 +12,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByUser_Username(String username);
 
     List<Ticket> findByScreening_Id(Long screeningId);
+
+    void deleteByUser_Id(Long userId);
 }

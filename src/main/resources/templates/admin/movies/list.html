@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin: Movies</title>
+    <title>Админ: Фильмы</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
@@ -9,37 +9,38 @@
 <header class="topbar">
     <div class="brand"><a th:href="@{/}">Cinema</a></div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
         </span>
-        <a th:href="@{/admin/movies}">Admin: Movies</a>
-        <a th:href="@{/admin/screenings}">Admin: Screenings</a>
+        <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+        <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
     </nav>
     <div class="auth">
         <span th:text="${#authentication.name}">admin</span>
         <form th:action="@{/logout}" method="post" class="inline">
-            <button type="submit" class="link-button">Logout</button>
+            <button type="submit" class="link-button">Выйти</button>
         </form>
     </div>
 </header>
 
 <main class="container">
-    <h1>Movies (admin)</h1>
+    <h1>Фильмы (админ)</h1>
 
     <p>
-        <a th:href="@{/admin/movies/new}" class="btn btn-primary">Add movie</a>
+        <a th:href="@{/admin/movies/new}" class="btn btn-primary">Добавить фильм</a>
     </p>
 
     <table>
         <thead>
         <tr>
-            <th>Poster</th>
-            <th>Title</th>
-            <th>Genre</th>
-            <th>Duration</th>
-            <th>Actions</th>
+            <th>Постер</th>
+            <th>Название</th>
+            <th>Жанр</th>
+            <th>Страна</th>
+            <th>Длительность</th>
+            <th>Действия</th>
         </tr>
         </thead>
         <tbody>
@@ -50,18 +51,18 @@
                      alt="poster"
                      style="width:60px; height:80px; object-fit:cover; border-radius:4px;">
             </td>
-            <td th:text="${m.title}">Title</td>
-            <td th:text="${m.genre}">Genre</td>
+            <td th:text="${m.title}">Название</td>
+            <td th:text="${m.genre}">Жанр</td>
+            <td th:text="${m.country}">Страна</td>
             <td>
-                <span th:text="${m.durationMinutes}">120</span> min
+                <span th:text="${m.durationMinutes != null ? m.durationMinutes : '—'}">120</span> мин
             </td>
             <td>
-                <a th:href="@{|/admin/movies/${m.id}/edit|}">Edit</a>
+                <a th:href="@{|/admin/movies/${m.id}/edit|}">Редактировать</a>
                 |
-                <form th:action="@{|/admin/movies/${m.id}/delete|}"
-                      method="post" class="inline"
-                      onsubmit="return confirm('Delete this movie?');">
-                    <button type="submit" class="link-button">Delete</button>
+                <form th:action="@{|/admin/movies/${m.id}/delete|}" method="post" class="inline"
+                      onsubmit="return confirm('Удалить этот фильм?');">
+                    <button type="submit" class="link-button">Удалить</button>
                 </form>
             </td>
         </tr>

@@ -125,6 +125,7 @@ public class PublicController {
         } else {
             movies = movieRepository.findAll();
         }
+
         model.addAttribute("movies", movies);
         model.addAttribute("query", query);
 
