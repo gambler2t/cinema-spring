@@ -6,14 +6,13 @@ import com.example.cinema.domain.Ticket;
 import com.example.cinema.repo.AppUserRepository;
 import com.example.cinema.repo.ScreeningRepository;
 import com.example.cinema.repo.TicketRepository;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,18 +34,21 @@ public class TicketController {
         this.userRepository = userRepository;
     }
 
-    // Отображение формы бронирования билета
+    // Отображение формы бронирования билетов
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/book/{screeningId}")
     public String showBookingForm(@PathVariable Long screeningId,
                                   Model model,
                                   Authentication authentication) {
+
         Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new IllegalArgumentException("Screening not found: " + screeningId));
 
+        // Создаем пустой билет для формы
         Ticket ticket = new Ticket();
         ticket.setScreening(screening);
 
+        // Заполняем имя пользователя
         if (authentication != null) {
             String username = authentication.getName();
             userRepository.findByUsername(username).ifPresent(user -> {
@@ -58,97 +60,61 @@ public class TicketController {
             });
         }
 
-        // параметры зала (можно потом вынести в настройки)
+        // Параметры зала
         int rowsCount = 10;
         int seatsPerRow = 18;
 
+        // Получаем занятые места
         Set<String> occupiedSeats = ticketRepository.findByScreening_Id(screeningId)
                 .stream()
-                .map(Ticket::getSeat) // seat в формате "row-seat", напр. "5-7"
+                .map(Ticket::getSeat)
                 .collect(Collectors.toSet());
 
-        List<Integer> rows = IntStream.rangeClosed(1, rowsCount).boxed().toList();
-        List<Integer> seats = IntStream.rangeClosed(1, seatsPerRow).boxed().toList();
+        List<Integer> rows = IntStream.rangeClosed(1, rowsCount).boxed().collect(Collectors.toList());
+        List<Integer> seats = IntStream.rangeClosed(1, seatsPerRow).boxed().collect(Collectors.toList());
 
         model.addAttribute("ticket", ticket);
         model.addAttribute("rows", rows);
         model.addAttribute("seats", seats);
         model.addAttribute("occupiedSeats", occupiedSeats);
+        model.addAttribute("selectedSeats", new ArrayList<String>());
 
         return "tickets/book";
     }
 
-    // Обработка бронирования билета
+    // Обработка бронирования нескольких билетов
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/book")
-    public String book(@Valid @ModelAttribute("ticket") Ticket ticket,
-                       BindingResult bindingResult,
-                       Model model,
+    public String book(@ModelAttribute("ticket") Ticket ticketTemplate,
+                       @RequestParam("selectedSeats") List<String> selectedSeats,
                        Authentication authentication) {
 
         if (authentication == null) {
-            bindingResult.reject("user", "You must be logged in");
+            return "redirect:/login";
         }
 
-        // подтягиваем сеанс
-        if (ticket.getScreening() == null || ticket.getScreening().getId() == null) {
-            bindingResult.reject("screening", "Screening is required");
-        } else {
-            Screening screening = screeningRepository.findById(ticket.getScreening().getId())
-                    .orElse(null);
-            if (screening == null) {
-                bindingResult.reject("screening", "Screening not found");
-            } else {
+        // Находим пользователя
+        String username = authentication.getName();
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Находим сеанс
+        Screening screening = screeningRepository.findById(ticketTemplate.getScreening().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Screening not found"));
+
+        // Создаем билеты для каждого выбранного места
+        for (String seat : selectedSeats) {
+            // Проверяем, что место свободно
+            if (!ticketRepository.existsByScreening_IdAndSeat(screening.getId(), seat)) {
+                Ticket ticket = new Ticket();
                 ticket.setScreening(screening);
-            }
-        }
-
-        // находим пользователя
-        if (authentication != null) {
-            String username = authentication.getName();
-            AppUser user = userRepository.findByUsername(username).orElse(null);
-            if (user == null) {
-                bindingResult.reject("user", "User not found");
-            } else {
                 ticket.setUser(user);
+                ticket.setCustomerName(ticketTemplate.getCustomerName());
+                ticket.setSeat(seat);
+                ticketRepository.save(ticket);
             }
         }
 
-        // проверяем, что место не пустое и ещё свободно
-        if (ticket.getSeat() == null || ticket.getSeat().isBlank()) {
-            bindingResult.rejectValue("seat", "seat.empty", "Пожалуйста, выберите место.");
-        } else if (!bindingResult.hasErrors()) {
-            boolean alreadyTaken = ticketRepository.existsByScreening_IdAndSeat(ticket.getScreening().getId(), ticket.getSeat());
-            if (alreadyTaken) {
-                bindingResult.rejectValue("seat", "seat.taken", "Место уже занято.");
-            }
-        }
-
-        if (bindingResult.hasErrors()) {
-            // если есть ошибки, нужно снова отдать схему зала
-            int rowsCount = 10;
-            int seatsPerRow = 18;
-            List<Integer> rows = IntStream.rangeClosed(1, rowsCount).boxed().toList();
-            List<Integer> seats = IntStream.rangeClosed(1, seatsPerRow).boxed().toList();
-            Set<String> occupiedSeats = ticketRepository.findByScreening_Id(
-                            ticket.getScreening().getId()).stream()
-                    .map(Ticket::getSeat)
-                    .collect(Collectors.toSet());
-
-            model.addAttribute("rows", rows);
-            model.addAttribute("seats", seats);
-            model.addAttribute("occupiedSeats", occupiedSeats);
-
-            return "tickets/book";
-        }
-
-        try {
-            ticketRepository.save(ticket);
-        } catch (Exception e) {
-            bindingResult.reject("ticket", "Ошибка при сохранении билета.");
-            return "tickets/book";
-        }
-
-        return "redirect:/user/profile";
+        return "redirect:/user/profile?booked=" + selectedSeats.size();
     }
 }

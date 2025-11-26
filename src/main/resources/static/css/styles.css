@@ -49,6 +49,16 @@ a:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
+.container-wide {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
 h1, h2, h3 {
     font-weight: 600;
 }
@@ -70,26 +80,104 @@ table th {
     background-color: #f3f4f6;
 }
 
+/* Обновленные стили для кнопок */
 .btn, button {
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 12px 24px;
     border: none;
+    border-radius: 12px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 .btn-primary {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
 .btn-secondary {
-    background-color: #e5e7eb;
-    color: #111827;
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(107, 114, 128, 0.4);
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
+.btn-full {
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #3b82f6;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.btn-outline:hover {
+    background: #3b82f6;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
 }
 
 form.inline {
@@ -106,102 +194,266 @@ form.inline {
     cursor: pointer;
 }
 
+/* Обновленная строка поиска */
 .search-bar {
-    margin: 12px 0 16px;
+    margin: 20px 0 24px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
 .search-bar input[type="text"] {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    width: 220px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    width: 300px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.search-bar button {
-    margin-left: 8px;
+.search-bar input[type="text"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
 }
 
+/* Обновленный tag */
 .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    background-color: #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
-/* --- movie cards --- */
-
+/* Обновленные стили для карточек фильмов */
 .movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
 }
 
 .movie-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            0 0 0 1px rgba(255, 255, 255, 0.9);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.movie-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow:
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.95);
+}
+
+.movie-card:hover::before {
+    opacity: 1;
+}
+
+.movie-poster {
+    position: relative;
+    overflow: hidden;
 }
 
 .movie-poster img {
     width: 100%;
-    height: 300px;
+    height: 320px;
     object-fit: cover;
     display: block;
+    transition: transform 0.5s ease;
+}
+
+.movie-card:hover .movie-poster img {
+    transform: scale(1.05);
+}
+
+.movie-poster::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
 }
 
 .movie-poster-placeholder {
     width: 100%;
-    height: 300px;
-    background: #111827;
-    color: #9ca3af;
+    height: 320px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.movie-poster-placeholder::before {
+    content: '🎬';
+    font-size: 48px;
+    position: absolute;
+    opacity: 0.3;
 }
 
 .movie-content {
-    padding: 10px 12px 4px;
+    padding: 20px 20px 12px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .movie-content h3 {
-    margin: 0 0 4px;
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.3;
 }
 
 .movie-genre {
-    margin: 0 0 6px;
-    font-size: 13px;
-    color: #6b7280;
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #ec4899;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .movie-desc {
     margin: 0;
-    font-size: 13px;
-    color: #4b5563;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    flex-grow: 1;
 }
 
 .movie-footer {
-    padding: 8px 12px 10px;
+    padding: 16px 20px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: rgba(249, 250, 251, 0.8);
+    border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
 
-/* --- movie details --- */
+/* Улучшенная кнопка избранного */
+.favorite-form {
+    display: inline-flex;
+    margin: 0;
+}
 
-.movie-details .movie-hero {
+.favorite-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 8px;
+    border-radius: 50%;
+    color: #d1d5db;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.favorite-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: rgba(236, 72, 153, 0.1);
+    transform: scale(0);
+    transition: transform 0.3s ease;
+}
+
+.favorite-btn:hover {
+    color: #f472b6;
+    transform: scale(1.1);
+}
+
+.favorite-btn:hover::before {
+    transform: scale(1);
+}
+
+.favorite-btn.active {
+    color: #ec4899;
+    animation: heartBeat 0.6s ease;
+}
+
+.favorite-btn.active::before {
+    background: rgba(236, 72, 153, 0.15);
+    transform: scale(1);
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Movie Details */
+.movie-details {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.movie-hero {
     display: grid;
     grid-template-columns: 260px 1fr;
     gap: 24px;
+    margin-bottom: 40px;
+    align-items: flex-start;
+}
+
+.movie-hero-poster {
+    flex: 0 0 300px;
 }
 
 .movie-hero-poster img {
     width: 100%;
+    height: auto;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
@@ -211,19 +463,18 @@ form.inline {
 }
 
 .movie-hero-actions {
-    margin-top: 16px;
+    margin: 20px 0;
 }
 
 .movie-description {
-    margin-top: 32px;
+    margin: 32px 0 40px;
 }
 
 .movie-screenings {
-    margin-top: 32px;
+    margin-bottom: 40px;
 }
 
-/* --- seat map --- */
-
+/* Seat Map */
 .seat-map-section {
     margin-top: 24px;
 }
@@ -271,23 +522,59 @@ form.inline {
     color: #9ca3af;
     font-size: 11px;
     cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .seat:hover {
     border-color: #c4b5fd;
+    transform: scale(1.1);
 }
 
-.seat-occupied {
-    background-color: #4b5563;
-    border-color: #4b5563;
-    color: #111827;
-    cursor: default;
+.seat.available {
+    background-color: #f8f9fa;
+    color: #333;
 }
 
-.seat-selected {
-    background-color: #ec4899;
-    border-color: #f9a8d4;
-    color: #f9fafb;
+.seat.available:hover {
+    background-color: #e9ecef;
+    border-color: #6c757d;
+}
+
+.seat.selected {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.seat.occupied {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    cursor: not-allowed;
+}
+
+.seat.occupied:hover {
+    transform: none;
+}
+
+.seat.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #28a745;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .seat-legend {
@@ -295,6 +582,14 @@ form.inline {
     display: flex;
     gap: 16px;
     font-size: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .legend-box {
@@ -310,8 +605,28 @@ form.inline {
     background-color: #111827;
 }
 
-/* --- расширенный лэйаут для страницы фильмов с боковыми баннерами --- */
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 3px;
+}
 
+.legend-color.selected {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.legend-color.occupied {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.legend-color.available {
+    background-color: #f8f9fa;
+}
+
+/* Page Layout */
 .page-layout {
     display: flex;
     justify-content: center;
@@ -320,24 +635,20 @@ form.inline {
     padding: 24px 32px 40px;
 }
 
-.container-wide {
-    max-width: 1100px;
-    width: 100%;
-    margin: 0;
-    padding: 16px 24px 32px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
-
 .movies-main h1 {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    margin-bottom: 8px;
     margin-top: 0;
 }
 
 .side-banner {
     flex: 0 0 220px;
     position: sticky;
-    top: 72px; /* чтобы баннер "прилипал" чуть ниже хедера */
+    top: 72px;
 }
 
 .side-banner-card {
@@ -371,56 +682,7 @@ form.inline {
     line-height: 1.4;
 }
 
-/* адаптив: на маленьких экранах убираем боковые баннеры и даём контенту всю ширину */
-
-@media (max-width: 1100px) {
-    .page-layout {
-        flex-direction: column;
-        padding: 16px;
-    }
-
-    .side-banner {
-        display: none;
-    }
-
-    .container-wide {
-        margin: 0 auto;
-        padding: 16px;
-    }
-}
-
-.date-tabs {
-    margin: 12px 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.date-chip {
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
-    background-color: #f9fafb;
-    font-size: 13px;
-    color: #374151;
-}
-
-.date-chip:hover {
-    background-color: #e5e7eb;
-}
-
-.date-chip.active {
-    background-color: #ec4899;
-    border-color: #ec4899;
-    color: #f9fafb;
-}
-
-.btn-small {
-    padding: 4px 10px;
-    font-size: 13px;
-}
-/* ----- Date chips над таблицей ----- */
-
+/* Date Tabs */
 .date-tabs {
     margin: 14px 0 10px;
     display: flex;
@@ -471,8 +733,7 @@ form.inline {
     color: #f9fafb;
 }
 
-/* ----- Таблица сеансов ----- */
-
+/* Screenings Table */
 .screenings-table {
     width: 100%;
     border-collapse: separate;
@@ -501,7 +762,6 @@ form.inline {
     background-color: #eef2ff;
 }
 
-/* закруглим "карточку" ряда */
 .screenings-table tbody tr td:first-child {
     border-radius: 10px 0 0 10px;
 }
@@ -509,8 +769,6 @@ form.inline {
 .screenings-table tbody tr td:last-child {
     border-radius: 0 10px 10px 0;
 }
-
-/* ----- Время и цена ----- */
 
 .time-chip {
     display: inline-flex;
@@ -537,11 +795,7 @@ form.inline {
     font-size: 13px;
 }
 
-/* уже был, но — для кнопки "Buy ticket" поменьше */
-.btn-small {
-    padding: 4px 10px;
-    font-size: 13px;
-}
+/* About Page */
 .about-container h1 {
     margin-bottom: 16px;
 }
@@ -583,11 +837,51 @@ form.inline {
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
 }
 
-/* адаптив для узких экранов */
-@media (max-width: 960px) {
-    .about-grid {
-        grid-template-columns: 1fr;
-    }
+/* Forms */
+.form-group {
+    margin-top: 12px;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-input,
+.form-textarea,
+.readonly-input {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.readonly-input {
+    background-color: #f8f9fa;
+    color: #666;
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.inline-form {
+    display: inline;
 }
 
 .field-error {
@@ -596,37 +890,16 @@ form.inline {
     margin-top: 4px;
 }
 
-.profile-section {
-    margin-bottom: 24px;
+.form-error {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background-color: #fef2f2;
+    color: #b91c1c;
+    font-size: 13px;
 }
 
-.favorite-form {
-    display: inline-block;
-    margin: 0;
-}
-
-.favorite-btn {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 0 0 0 6px;
-    color: #9ca3af; /* серое сердечко по умолчанию */
-    transition: transform 0.1s ease, color 0.1s ease;
-}
-
-.favorite-btn:hover {
-    transform: scale(1.1);
-    color: #f472b6;
-}
-
-.favorite-btn.active {
-    color: #ec4899; /* розовое сердечко, если в избранном */
-}
-
-/* -------- Auth pages (login / register) -------- */
-
+/* Auth */
 .auth-page {
     min-height: calc(100vh - 56px);
     display: flex;
@@ -657,49 +930,8 @@ form.inline {
     color: #6b7280;
 }
 
-.form-group {
-    margin-top: 12px;
-}
-
-.form-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    padding: 8px 10px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.form-error {
-    margin-top: 8px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    background-color: #fef2f2;
-    color: #b91c1c;
-    font-size: 13px;
-}
-
 .auth-actions {
     margin-top: 16px;
-}
-
-.btn-full {
-    width: 100%;
-    display: inline-flex;
-    justify-content: center;
-}
-
-.btn-small {
-    padding: 4px 10px;
-    font-size: 13px;
 }
 
 .auth-secondary {
@@ -711,110 +943,673 @@ form.inline {
     color: #2563eb;
 }
 
-.field-error {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #b91c1c;
+/* Profile */
+.profile-section {
+    margin-bottom: 24px;
 }
 
-/* Стили для страницы подробностей фильма */
-.movie-details {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.movie-hero {
-    display: flex;
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
     gap: 30px;
-    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+.user-info-section {
+    grid-column: 1;
+}
+
+.tickets-section {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.favorites-section {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.user-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 4px solid #2c5aa0;
+    margin-bottom: 25px;
+}
+
+.tickets-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.ticket-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
     align-items: flex-start;
 }
 
-.movie-hero-poster {
-    flex: 0 0 300px;
+.ticket-card.upcoming {
+    border-left: 4px solid #28a745;
 }
 
-.movie-hero-poster img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
+.ticket-card.past {
+    border-left: 4px solid #6c757d;
+    opacity: 0.8;
 }
 
-.movie-poster-placeholder {
-    width: 300px;
-    height: 450px;
-    background: #f0f0f0;
+.ticket-header {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    color: #666;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
 }
 
-.movie-hero-info {
-    flex: 1;
-}
-
-.movie-hero-actions {
-    margin: 20px 0;
-}
-
-.movie-description {
-    margin-bottom: 40px;
-}
-
-.screenings {
-    margin-bottom: 40px;
-}
-
-.screenings-list {
-    list-style: none;
-    padding: 0;
-}
-
-.screenings-list li {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.screening-time {
-    font-weight: bold;
-    min-width: 60px;
-}
-
-.screening-hall {
-    color: #666;
-    min-width: 100px;
-}
-
-.screening-price {
+.ticket-header h3 {
+    margin: 0;
     color: #2c5aa0;
-    font-weight: bold;
-    min-width: 120px;
 }
 
-.btn-small {
-    padding: 5px 10px;
+.ticket-status {
+    background: #6c757d;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.ticket-card.upcoming .ticket-status {
+    background: #28a745;
+}
+
+.ticket-details {
+    margin-bottom: 15px;
+}
+
+.ticket-details p {
+    margin: 5px 0;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ticket-screening-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.favorite-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+}
+
+.favorite-card h4 {
+    margin: 0 0 10px 0;
     font-size: 14px;
 }
 
-/* Адаптивность */
+/* Tickets & Booking */
+.ticket-list {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.selected-seats-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.selected-seats-list {
+    min-height: 60px;
+}
+
+.selected-seats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.selected-seat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.seat-info {
+    font-weight: 500;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.no-seats-message {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.booking-summary {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 20px 0;
+}
+
+.booking-summary p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.selection-info {
+    color: #666;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.total-price {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.total-price .tag {
+    background: #28a745;
+}
+
+/* Alerts */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.seat.selected {
+    animation: pulse 0.5s ease;
+}
+
+/* Стили для страницы бронирования - ОБНОВЛЕННЫЕ ДЛЯ 15 МЕСТ */
+.booking-page .seat-map-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 10px 0;
+}
+
+.booking-page .seat-map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 15px;
+    background: #1a1f36;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.booking-page .seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin-bottom: 2px;
+}
+
+.booking-page .row-label {
+    width: 22px;
+    text-align: center;
+    font-weight: bold;
+    color: #e5e7eb;
+    font-size: 11px;
+    margin: 0 6px;
+    flex-shrink: 0;
+}
+
+.booking-page .seat {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #4b5563;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    background: #374151;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+.booking-page .seat:hover {
+    transform: scale(1.1);
+    border-color: #c4b5fd;
+}
+
+.booking-page .seat.available {
+    background-color: #f8f9fa;
+    color: #333;
+    border-color: #d1d5db;
+}
+
+.booking-page .seat.available:hover {
+    background-color: #e5e7eb;
+    border-color: #6b7280;
+}
+
+.booking-page .seat.selected {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.booking-page .seat.occupied {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.booking-page .seat.occupied:hover {
+    transform: none;
+    border-color: #ef4444;
+}
+
+.booking-page .screen-indicator {
+    text-align: center;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 8px 16px;
+    background: linear-gradient(180deg, #4b5563 0%, #374151 100%);
+    color: white;
+    width: 340px;
+    max-width: 90%;
+    border-radius: 6px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.booking-page .seat-legend {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    padding: 10px 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.booking-page .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.booking-page .legend-color {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.booking-page .legend-color.available {
+    background-color: #f8f9fa;
+    border-color: #d1d5db;
+}
+
+.booking-page .legend-color.selected {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.booking-page .legend-color.occupied {
+    background-color: #ef4444;
+    border-color: #ef4444;
+}
+
+.booking-page .selected-seats-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    border-left: 4px solid #3b82f6;
+}
+
+.booking-page .selected-seats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.booking-page .selected-seat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+    border-left: 3px solid #10b981;
+    font-size: 11px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.booking-page .btn-remove {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    font-size: 9px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.booking-page .btn-remove:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.booking-page .booking-summary {
+    background: #e5e7eb;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 13px;
+    border-left: 4px solid #3b82f6;
+}
+
+.booking-page .selection-info {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 12px;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.booking-page .no-seats-message {
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    margin: 12px 0;
+    font-size: 12px;
+}
+
+.booking-page .seat-info {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.booking-page .ticket-screening-info {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.booking-page .ticket-screening-info p {
+    margin: 6px 0;
+    font-size: 13px;
+}
+
+.booking-page .total-price {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #d1d5db;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.booking-page .form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.booking-page .form-actions .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-width: 140px;
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+    .booking-page .seat-map {
+        padding: 10px;
+        transform: scale(0.9);
+    }
+
+    .booking-page .seat {
+        width: 22px;
+        height: 22px;
+        font-size: 8px;
+    }
+
+    .booking-page .screen-indicator {
+        width: 300px !important;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .booking-page .seat-legend {
+        gap: 8px;
+        padding: 8px 12px;
+    }
+
+    .booking-page .legend-item {
+        font-size: 11px;
+    }
+
+    .booking-page .selected-seats-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .booking-page .form-actions {
+        flex-direction: column;
+    }
+
+    .booking-page .form-actions .btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 360px) {
+    .booking-page .seat-map {
+        transform: scale(0.85);
+        padding: 8px;
+    }
+
+    .booking-page .seat {
+        width: 20px;
+        height: 20px;
+        font-size: 7px;
+    }
+
+    .booking-page .screen-indicator {
+        width: 260px !important;
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+
+    .booking-page .seat-legend {
+        transform: scale(0.9);
+        padding: 6px 10px;
+    }
+
+    .booking-page .selected-seats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .page-layout {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .side-banner {
+        display: none;
+    }
+
+    .container-wide {
+        margin: 0 auto;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 960px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
-    .movie-hero {
-        flex-direction: column;
+    .profile-layout {
+        grid-template-columns: 1fr;
     }
 
-    .movie-hero-poster {
-        align-self: center;
+    .tickets-section {
+        grid-column: 1;
+        grid-row: 2;
     }
 
-    .screenings-list li {
+    .favorites-section {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .ticket-card {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .ticket-header {
+        flex-direction: column;
         gap: 10px;
+    }
+
+    .ticket-actions {
+        align-self: stretch;
+    }
+
+    .ticket-actions .btn {
+        width: 100%;
+    }
+
+    .favorites-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    .selected-seats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-seat-item {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
     }
 }

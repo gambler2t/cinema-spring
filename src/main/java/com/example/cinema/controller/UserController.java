@@ -16,6 +16,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -34,8 +35,6 @@ public class UserController {
         this.movieRepository = movieRepository;
     }
 
-    // -------- Профиль, ближайшие сеансы, история, последние избранные --------
-
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
         String username = authentication.getName();
@@ -43,29 +42,26 @@ public class UserController {
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
-        // все билеты пользователя
+        // Все билеты пользователя
         List<Ticket> allTickets = ticketRepository.findByUser_Username(username);
         LocalDateTime now = LocalDateTime.now();
 
-        // ближайшие сеансы
+        // Ближайшие сеансы
         List<Ticket> upcomingTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isAfter(now))
-                .toList();
+                .collect(Collectors.toList());
 
-        // прошедшие (история посещений)
+        // Прошедшие сеансы
         List<Ticket> pastTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isBefore(now))
-                .toList();
+                .collect(Collectors.toList());
 
-        // последние избранные фильмы (до 4 штук, по id "сверху")
-        List<Movie> recentFavorites = (user.getFavoriteMovies() == null)
-                ? List.of()
-                : user.getFavoriteMovies().stream()
+        // Последние избранные
+        List<Movie> recentFavorites = user.getFavoriteMovies().stream()
                 .sorted(Comparator.comparing(Movie::getId).reversed())
                 .limit(4)
-                .toList();
+                .collect(Collectors.toList());
 
-        model.addAttribute("username", user.getUsername());
         model.addAttribute("user", user);
         model.addAttribute("upcomingTickets", upcomingTickets);
         model.addAttribute("pastTickets", pastTickets);
@@ -74,10 +70,8 @@ public class UserController {
         return "user/profile";
     }
 
-    // -------- Обновление профиля (ФИО, email, bio) --------
-
     @PostMapping("/profile")
-    public String updateProfile(@ModelAttribute("user") AppUser form,
+    public String updateProfile(@ModelAttribute AppUser form,
                                 Authentication authentication) {
 
         String username = authentication.getName();
@@ -93,17 +87,12 @@ public class UserController {
         return "redirect:/user/profile?updated";
     }
 
-    // -------- Удаление билета --------
-
     @PostMapping("/tickets/{id}/delete")
-    public String deleteTicket(@PathVariable Long id,
-                               Principal principal) {
+    public String deleteTicket(@PathVariable Long id, Principal principal) {
 
         Ticket ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null && ticket.getUser() != null) {
             String currentUser = principal.getName();
-
-            // удалять можно только свои билеты
             if (currentUser.equals(ticket.getUser().getUsername())) {
                 ticketRepository.delete(ticket);
             }
@@ -112,35 +101,24 @@ public class UserController {
         return "redirect:/user/profile";
     }
 
-    // -------- Избранные фильмы --------
-
     @PostMapping("/favorites/{movieId}/toggle")
-    public String toggleFavorite(@PathVariable Long movieId,
-                                 Principal principal,
-                                 @RequestHeader(value = "Referer", required = false) String referer) {
+    public String toggleFavorite(@PathVariable Long movieId, Principal principal) {
 
-        // текущий пользователь
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // фильм
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
 
-        // если фильм уже в избранном — убираем, иначе добавляем
         if (user.getFavoriteMovies().contains(movie)) {
-            user.removeFavoriteMovie(movie);
+            user.getFavoriteMovies().remove(movie);
         } else {
-            user.addFavoriteMovie(movie);
+            user.getFavoriteMovies().add(movie);
         }
 
         userRepository.save(user);
 
-        // возвращаемся туда, откуда пришли (детали фильма / список)
-        if (referer != null && !referer.isBlank()) {
-            return "redirect:" + referer;
-        }
-        return "redirect:/movies";
+        return "redirect:/movies/" + movieId;
     }
 
     @GetMapping("/favorites")

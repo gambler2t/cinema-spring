@@ -17,7 +17,7 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER) // Добавьте fetch = FetchType.EAGER
     @JoinColumn(name = "movie_id")
     private Movie movie;
 

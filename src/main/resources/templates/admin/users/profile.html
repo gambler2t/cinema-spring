@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Мой профиль</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Фильмы</a>
+        <a th:href="@{/about}">О кинотеатре</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">Мои билеты</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
+        </span>
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/movies}">Админ</a>
+        </span>
+    </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Войти</a>
+
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Выйти</button>
+            </form>
+        </span>
+    </div>
+</header>
+
+<main class="container">
+    <h1>Мой профиль</h1>
+
+    <div th:if="${param.booked}" class="alert alert-success">
+        Успешно забронировано <span th:text="${param.booked}">0</span> билетов!
+    </div>
+
+    <div th:if="${param.updated}" class="alert alert-success">
+        Профиль успешно обновлен!
+    </div>
+
+    <div class="profile-layout">
+        <section class="user-info-section">
+            <h2>Информация о пользователе</h2>
+            <div class="user-card">
+                <p><strong>Имя пользователя:</strong> <span th:text="${user.username}">username</span></p>
+                <p><strong>Полное имя:</strong> <span th:text="${user.fullName != null ? user.fullName : 'Не указано'}">Full Name</span></p>
+                <p><strong>Email:</strong> <span th:text="${user.email != null ? user.email : 'Не указан'}">email</span></p>
+                <p th:if="${user.bio}"><strong>О себе:</strong> <span th:text="${user.bio}">Bio</span></p>
+
+                <form th:action="@{/user/profile}" method="post" class="profile-form">
+                    <h3>Редактировать профиль</h3>
+                    <div class="form-group">
+                        <label>Полное имя:</label>
+                        <input type="text" name="fullName" th:value="${user.fullName}" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" name="email" th:value="${user.email}" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>О себе:</label>
+                        <textarea name="bio" class="form-textarea" th:text="${user.bio}"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Обновить профиль</button>
+                </form>
+            </div>
+
+            <section class="favorites-section" th:if="${not recentFavorites.empty}">
+                <h2>Недавно добавленные в избранное</h2>
+                <div class="favorites-grid">
+                    <div th:each="movie : ${recentFavorites}" class="favorite-card">
+                        <h4 th:text="${movie.title}">Название фильма</h4>
+                        <a th:href="@{/movies/{id}(id=${movie.id})}" class="btn btn-secondary btn-small">Подробнее</a>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="tickets-section">
+            <h2>Ближайшие сеансы</h2>
+            <div th:if="${upcomingTickets.empty}">
+                <p>У вас нет предстоящих сеансов.</p>
+                <a th:href="@{/movies}" class="btn btn-primary">Посмотреть фильмы</a>
+            </div>
+            <div th:unless="${upcomingTickets.empty}" class="tickets-grid">
+                <div th:each="ticket : ${upcomingTickets}" class="ticket-card upcoming">
+                    <div class="ticket-movie">
+                        <h3 th:text="${ticket.screening.movie.title}">Название фильма</h3>
+                        <p><strong>Дата и время:</strong>
+                            <span th:text="${#temporals.format(ticket.screening.startTime, 'dd.MM.yyyy HH:mm')}">01.01.2025 19:00</span>
+                        </p>
+                        <p><strong>Зал:</strong> <span th:text="${ticket.screening.hall}">Зал 1</span></p>
+                        <p><strong>Место:</strong> <span th:text="${ticket.seat}">1-1</span></p>
+                        <p><strong>Цена:</strong> <span th:text="${ticket.screening.price}">500</span> руб.</p>
+                    </div>
+                    <div class="ticket-actions">
+                        <a th:href="@{/movies/{id}(id=${ticket.screening.movie.id})}"
+                           class="btn btn-secondary btn-small">О фильме</a>
+                        <form th:action="@{/user/tickets/{id}/delete(id=${ticket.id})}"
+                              method="post"
+                              class="inline-form"
+                              onsubmit="return confirm('Отменить бронирование?')">
+                            <button type="submit" class="btn btn-danger btn-small">Отменить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <h2>История посещений</h2>
+            <div th:if="${pastTickets.empty}">
+                <p>У вас нет завершенных сеансов.</p>
+            </div>
+            <div th:unless="${pastTickets.empty}" class="tickets-grid">
+                <div th:each="ticket : ${pastTickets}" class="ticket-card past">
+                    <div class="ticket-movie">
+                        <h3 th:text="${ticket.screening.movie.title}">Название фильма</h3>
+                        <p><strong>Дата и время:</strong>
+                            <span th:text="${#temporals.format(ticket.screening.startTime, 'dd.MM.yyyy HH:mm')}">01.01.2025 19:00</span>
+                        </p>
+                        <p><strong>Зал:</strong> <span th:text="${ticket.screening.hall}">Зал 1</span></p>
+                        <p><strong>Место:</strong> <span th:text="${ticket.seat}">1-1</span></p>
+                    </div>
+                    <div class="ticket-actions">
+                        <a th:href="@{/movies/{id}(id=${ticket.screening.movie.id})}"
+                           class="btn btn-secondary btn-small">О фильме</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>
