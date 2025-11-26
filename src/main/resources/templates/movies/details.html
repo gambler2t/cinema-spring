@@ -30,23 +30,25 @@
     </div>
 </header>
 
-<main class="container movie-details" th:object="${movie}">
+<main class="container movie-details">
     <section class="movie-hero">
         <div class="movie-hero-poster">
-            <img th:if="*{posterUrl != null}" th:src="*{posterUrl}" alt="Poster">
-            <div th:if="*{posterUrl == null}" class="movie-poster-placeholder">
+            <img th:if="${movie.posterUrl != null and !movie.posterUrl.isEmpty()}"
+                 th:src="${movie.posterUrl}"
+                 th:alt="${movie.title}">
+            <div th:if="${movie.posterUrl == null or movie.posterUrl.isEmpty()}"
+                 class="movie-poster-placeholder">
                 НЕТ ПОСТЕРА
             </div>
         </div>
         <div class="movie-hero-info">
-            <h1 th:text="*{title}">Название</h1>
+            <h1 th:text="${movie.title}">Название</h1>
 
             <div class="movie-hero-actions">
                 <form th:if="${#authorization.expression('hasRole(''USER'')')}"
-                      th:action="@{/user/favorites/{id}/toggle(id=*{id})}"
+                      th:action="@{/user/favorites/{id}/toggle(id=${movie.id})}"
                       method="post"
                       class="inline">
-
                     <button type="submit"
                             class="btn btn-secondary btn-small"
                             th:text="${isFavorite} ? 'Убрать из избранного' : 'В избранное'">
@@ -56,31 +58,77 @@
             </div>
 
             <p><strong>Жанр:</strong>
-                <span th:text="*{genre}">Жанр</span>
+                <span th:text="${movie.genre != null ? movie.genre : 'Не указан'}">Жанр</span>
             </p>
 
             <p><strong>Режиссёр:</strong>
-                <span th:text="*{director}">Режиссёр</span>
+                <span th:text="${movie.director != null ? movie.director : 'Не указан'}">Режиссёр</span>
             </p>
 
             <p><strong>Страна:</strong>
-                <span th:text="*{country}">Страна</span>
+                <span th:text="${movie.country != null ? movie.country : 'Не указана'}">Страна</span>
             </p>
 
             <p><strong>Длительность:</strong>
-                <span th:text="*{durationMinutes != null ? durationMinutes : '—'}">120</span> мин
+                <span th:text="${movie.durationMinutes != null ? movie.durationMinutes : '—'}">120</span> мин
             </p>
         </div>
-
     </section>
-    <section class="movie-description">
+
+    <section class="movie-description" th:if="${movie.description != null and !movie.description.isEmpty()}">
         <h2>Описание</h2>
-        <p th:text="*{description}">
+        <p th:text="${movie.description}">
             Описание фильма...
         </p>
     </section>
 
-    <!-- дальше можно оставить твой блок с сеансами как есть -->
+    <section class="screenings" th:if="${not availableDates.empty}">
+        <h2>Сеансы</h2>
+        <div>
+            <strong>Выберите дату:</strong>
+            <form method="get" th:action="@{/movies/{id}(id=${movie.id})}">
+                <select name="date" onchange="this.form.submit()">
+                    <option th:each="date : ${availableDates}"
+                            th:value="${date}"
+                            th:text="${date}"
+                            th:selected="${date == selectedDate}">
+                    </option>
+                </select>
+            </form>
+        </div>
+
+        <div th:if="${not screeningsForDay.empty}">
+            <h3>Сеансы на <span th:text="${selectedDate}">дату</span>:</h3>
+            <ul class="screenings-list">
+                <li th:each="screening : ${screeningsForDay}">
+                    <span class="screening-time"
+                          th:text="${#temporals.format(screening.startTime, 'HH:mm')}">
+                        19:00
+                    </span>
+                    <span class="screening-hall" th:text="'Зал: ' + ${screening.hall}">
+                        Зал: 1
+                    </span>
+                    <span class="screening-price"
+                          th:text="${screening.price != null ? screening.price + ' руб.' : 'Цена не указана'}">
+                        500 руб.
+                    </span>
+                    <a th:href="@{/tickets/book/{screeningId}(screeningId=${screening.id})}"
+                       class="btn btn-primary btn-small">
+                        Купить билет
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div th:if="${screeningsForDay.empty}">
+            <p>На выбранную дату сеансов нет.</p>
+        </div>
+    </section>
+
+    <section class="screenings" th:if="${availableDates.empty}">
+        <h2>Сеансы</h2>
+        <p>На данный момент сеансов для этого фильма нет.</p>
+    </section>
 </main>
+
 </body>
 </html>

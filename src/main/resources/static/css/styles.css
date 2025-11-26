@@ -716,3 +716,105 @@ form.inline {
     font-size: 12px;
     color: #b91c1c;
 }
+
+/* Стили для страницы подробностей фильма */
+.movie-details {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.movie-hero {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+    align-items: flex-start;
+}
+
+.movie-hero-poster {
+    flex: 0 0 300px;
+}
+
+.movie-hero-poster img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.movie-poster-placeholder {
+    width: 300px;
+    height: 450px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #666;
+}
+
+.movie-hero-info {
+    flex: 1;
+}
+
+.movie-hero-actions {
+    margin: 20px 0;
+}
+
+.movie-description {
+    margin-bottom: 40px;
+}
+
+.screenings {
+    margin-bottom: 40px;
+}
+
+.screenings-list {
+    list-style: none;
+    padding: 0;
+}
+
+.screenings-list li {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.screening-time {
+    font-weight: bold;
+    min-width: 60px;
+}
+
+.screening-hall {
+    color: #666;
+    min-width: 100px;
+}
+
+.screening-price {
+    color: #2c5aa0;
+    font-weight: bold;
+    min-width: 120px;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .movie-hero {
+        flex-direction: column;
+    }
+
+    .movie-hero-poster {
+        align-self: center;
+    }
+
+    .screenings-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

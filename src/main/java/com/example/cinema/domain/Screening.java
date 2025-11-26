@@ -17,7 +17,6 @@ public class Screening {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // много сеансов к одному фильму
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id")
     private Movie movie;

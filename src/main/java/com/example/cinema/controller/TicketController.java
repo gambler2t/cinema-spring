@@ -35,6 +35,7 @@ public class TicketController {
         this.userRepository = userRepository;
     }
 
+    // Отображение формы бронирования билета
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/book/{screeningId}")
     public String showBookingForm(@PathVariable Long screeningId,
@@ -77,6 +78,7 @@ public class TicketController {
         return "tickets/book";
     }
 
+    // Обработка бронирования билета
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/book")
     public String book(@Valid @ModelAttribute("ticket") Ticket ticket,
@@ -114,13 +116,11 @@ public class TicketController {
 
         // проверяем, что место не пустое и ещё свободно
         if (ticket.getSeat() == null || ticket.getSeat().isBlank()) {
-            bindingResult.rejectValue("seat", "seat.empty", "Seat must be selected");
+            bindingResult.rejectValue("seat", "seat.empty", "Пожалуйста, выберите место.");
         } else if (!bindingResult.hasErrors()) {
-            boolean alreadyTaken = ticketRepository.findByScreening_Id(
-                            ticket.getScreening().getId()).stream()
-                    .anyMatch(t -> t.getSeat().equals(ticket.getSeat()));
+            boolean alreadyTaken = ticketRepository.existsByScreening_IdAndSeat(ticket.getScreening().getId(), ticket.getSeat());
             if (alreadyTaken) {
-                bindingResult.rejectValue("seat", "seat.taken", "Seat already taken");
+                bindingResult.rejectValue("seat", "seat.taken", "Место уже занято.");
             }
         }
 
@@ -142,7 +142,13 @@ public class TicketController {
             return "tickets/book";
         }
 
-        ticketRepository.save(ticket);
+        try {
+            ticketRepository.save(ticket);
+        } catch (Exception e) {
+            bindingResult.reject("ticket", "Ошибка при сохранении билета.");
+            return "tickets/book";
+        }
+
         return "redirect:/user/profile";
     }
 }

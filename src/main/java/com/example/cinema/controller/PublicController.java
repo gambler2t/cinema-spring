@@ -7,19 +7,23 @@ import com.example.cinema.dto.RegistrationForm;
 import com.example.cinema.repo.AppUserRepository;
 import com.example.cinema.repo.MovieRepository;
 import com.example.cinema.repo.ScreeningRepository;
-import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -158,56 +162,56 @@ public class PublicController {
                                Model model,
                                Principal principal) {
 
-        Movie movie = movieRepository.findById(id)
+        // Получаем фильм по id и делаем его effectively final
+        final Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + id));
 
-        // все сеансы этого фильма
-        List<Screening> allScreenings =
-                screeningRepository.findByMovie_IdOrderByStartTimeAsc(id);
+        // Получаем все сеансы для фильма
+        List<Screening> allScreenings = screeningRepository.findByMovie_IdOrderByStartTimeAsc(id);
 
-        // только будущие сеансы
+        // Фильтруем только будущие сеансы
         LocalDateTime now = LocalDateTime.now();
         List<Screening> upcoming = allScreenings.stream()
-                .filter(s -> !s.getStartTime().isBefore(now))
-                .toList();
+                .filter(s -> s.getStartTime().isAfter(now))
+                .collect(Collectors.toList());
 
-        // доступные даты
+        // Список доступных дат для сеансов
         List<LocalDate> dates = upcoming.stream()
                 .map(s -> s.getStartTime().toLocalDate())
                 .distinct()
                 .sorted()
-                .toList();
+                .collect(Collectors.toList());
 
-        // выбранная дата
-        LocalDate selectedDate;
+        // Выбираем дату (используем effectively final переменную)
+        final LocalDate selectedDate;
         if (date != null) {
             selectedDate = date;
-        } else if (!dates.isEmpty()) {
-            selectedDate = dates.get(0);
         } else {
-            selectedDate = null;
+            selectedDate = !dates.isEmpty() ? dates.get(0) : null;
         }
 
-        // сеансы только выбранного дня
-        List<Screening> screeningsForDay;
+        // Фильтруем сеансы по выбранной дате
+        List<Screening> screeningsForDay = Collections.emptyList();
         if (selectedDate != null) {
+            final LocalDate finalSelectedDate = selectedDate; // effectively final копия
             screeningsForDay = upcoming.stream()
-                    .filter(s -> s.getStartTime().toLocalDate().equals(selectedDate))
-                    .toList();
-        } else {
-            screeningsForDay = List.of();
+                    .filter(s -> s.getStartTime().toLocalDate().equals(finalSelectedDate))
+                    .collect(Collectors.toList());
         }
 
-        // Флаг "в избранном" для текущего пользователя
+        // Проверка избранного для текущего пользователя
         boolean isFavorite = false;
         if (principal != null) {
-            AppUser user = userRepository.findByUsername(principal.getName()).orElse(null);
-            if (user != null && user.getFavoriteMovies() != null
-                    && user.getFavoriteMovies().contains(movie)) {
-                isFavorite = true;
+            // Создаем effectively final переменную для использования в лямбде
+            final String username = principal.getName();
+            AppUser user = userRepository.findByUsername(username).orElse(null);
+            if (user != null && user.getFavoriteMovies() != null) {
+                // Используем effectively final переменную movie
+                isFavorite = user.getFavoriteMovies().contains(movie);
             }
         }
 
+        // Передаем данные в модель
         model.addAttribute("movie", movie);
         model.addAttribute("availableDates", dates);
         model.addAttribute("selectedDate", selectedDate);
