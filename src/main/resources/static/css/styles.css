@@ -366,6 +366,7 @@ form.inline {
     align-items: center;
     background: rgba(249, 250, 251, 0.8);
     border-top: 1px solid rgba(229, 231, 235, 0.5);
+    min-height: 60px;
 }
 
 /* Улучшенная кнопка избранного */
@@ -1612,4 +1613,16 @@ form.inline {
         gap: 8px;
         text-align: center;
     }
+}
+
+.btn.disabled,
+.favorite-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.favorite-btn.disabled {
+    color: #9ca3af !important;
+    background: transparent !important;
 }

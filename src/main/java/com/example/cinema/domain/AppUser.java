@@ -1,14 +1,6 @@
 package com.example.cinema.domain;
 
 import jakarta.persistence.*;
-import com.example.cinema.domain.Movie;
-import java.util.HashSet;
-import java.util.Set;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
-
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +30,14 @@ public class AppUser {
     @Column(name = "role")
     private Set<String> roles = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_movies",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_id")
+    )
+    private Set<Movie> favoriteMovies = new HashSet<>();
+
     public AppUser() {
     }
 
@@ -49,6 +49,19 @@ public class AppUser {
 
     public void addRole(String role) {
         roles.add(role);
+    }
+
+    // Методы для работы с избранными фильмами
+    public boolean hasFavoriteMovie(Movie movie) {
+        return favoriteMovies.contains(movie);
+    }
+
+    public void addFavoriteMovie(Movie movie) {
+        this.favoriteMovies.add(movie);
+    }
+
+    public void removeFavoriteMovie(Movie movie) {
+        this.favoriteMovies.remove(movie);
     }
 
     // getters / setters
@@ -109,14 +122,6 @@ public class AppUser {
         this.bio = bio;
     }
 
-    @ManyToMany
-    @JoinTable(
-            name = "favorite_movies",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "movie_id")
-    )
-    private Set<Movie> favoriteMovies = new HashSet<>();
-
     public Set<Movie> getFavoriteMovies() {
         return favoriteMovies;
     }
@@ -124,14 +129,4 @@ public class AppUser {
     public void setFavoriteMovies(Set<Movie> favoriteMovies) {
         this.favoriteMovies = favoriteMovies;
     }
-
-    public void addFavoriteMovie(Movie movie) {
-        this.favoriteMovies.add(movie);
-    }
-
-    public void removeFavoriteMovie(Movie movie) {
-        this.favoriteMovies.remove(movie);
-    }
-
-
 }

@@ -6,6 +6,7 @@ import com.example.cinema.domain.Ticket;
 import com.example.cinema.repo.AppUserRepository;
 import com.example.cinema.repo.MovieRepository;
 import com.example.cinema.repo.TicketRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -49,11 +50,13 @@ public class UserController {
         // Ближайшие сеансы
         List<Ticket> upcomingTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isAfter(now))
+                .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
                 .collect(Collectors.toList());
 
         // Прошедшие сеансы
         List<Ticket> pastTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isBefore(now))
+                .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
                 .collect(Collectors.toList());
 
         // Последние избранные
@@ -101,9 +104,21 @@ public class UserController {
         return "redirect:/user/profile";
     }
 
-    @PostMapping("/favorites/{movieId}/toggle")
-    public String toggleFavorite(@PathVariable Long movieId, Principal principal) {
+    @GetMapping("/favorites")
+    public String favorites(Model model, Principal principal) {
+        AppUser user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        model.addAttribute("favorites", user.getFavoriteMovies());
+        return "user/favorites";
+    }
+
+    @PostMapping("/favorites/{movieId}/toggle")
+    public String toggleFavorite(@PathVariable Long movieId,
+                                 Principal principal,
+                                 HttpServletRequest request) {
+
+        // Логика добавления/удаления из избранного
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -118,15 +133,8 @@ public class UserController {
 
         userRepository.save(user);
 
-        return "redirect:/movies/" + movieId;
-    }
-
-    @GetMapping("/favorites")
-    public String favorites(Model model, Principal principal) {
-        AppUser user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        model.addAttribute("favorites", user.getFavoriteMovies());
-        return "user/favorites";
+        // Редирект на предыдущую страницу
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/movies");
     }
 }

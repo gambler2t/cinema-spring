@@ -162,8 +162,8 @@ public class PublicController {
                                Model model,
                                Principal principal) {
 
-        // Получаем фильм по id и делаем его effectively final
-        final Movie movie = movieRepository.findById(id)
+        // Получаем фильм по id
+        Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + id));
 
         // Получаем все сеансы для фильма
@@ -182,8 +182,8 @@ public class PublicController {
                 .sorted()
                 .collect(Collectors.toList());
 
-        // Выбираем дату (используем effectively final переменную)
-        final LocalDate selectedDate;
+        // Выбираем дату
+        LocalDate selectedDate;
         if (date != null) {
             selectedDate = date;
         } else {
@@ -193,20 +193,16 @@ public class PublicController {
         // Фильтруем сеансы по выбранной дате
         List<Screening> screeningsForDay = Collections.emptyList();
         if (selectedDate != null) {
-            final LocalDate finalSelectedDate = selectedDate; // effectively final копия
             screeningsForDay = upcoming.stream()
-                    .filter(s -> s.getStartTime().toLocalDate().equals(finalSelectedDate))
+                    .filter(s -> s.getStartTime().toLocalDate().equals(selectedDate))
                     .collect(Collectors.toList());
         }
 
         // Проверка избранного для текущего пользователя
         boolean isFavorite = false;
         if (principal != null) {
-            // Создаем effectively final переменную для использования в лямбде
-            final String username = principal.getName();
-            AppUser user = userRepository.findByUsername(username).orElse(null);
+            AppUser user = userRepository.findByUsername(principal.getName()).orElse(null);
             if (user != null && user.getFavoriteMovies() != null) {
-                // Используем effectively final переменную movie
                 isFavorite = user.getFavoriteMovies().contains(movie);
             }
         }

@@ -13,6 +13,7 @@
         <a th:href="@{/about}">О кинотеатре</a>
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
             <a th:href="@{/admin/movies}">Админ</a>
@@ -89,10 +90,14 @@
 
                         <button type="submit"
                                 th:class="${favoriteIds != null and favoriteIds.contains(m.id)} ?
-                                   'favorite-btn active' : 'favorite-btn'">
+                                           'favorite-btn active' : 'favorite-btn'"
+                                th:style="${favoriteIds != null and favoriteIds.contains(m.id)} ?
+                                           'color: #ec4899' : 'color: #d1d5db'">
                             &#10084;
                         </button>
                     </form>
+
+                    <!-- Для неавторизованных - ничего не показываем -->
                 </div>
             </div>
         </div>
