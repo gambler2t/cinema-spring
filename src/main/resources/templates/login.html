@@ -8,7 +8,7 @@
 
 <header class="topbar">
     <div class="brand">
-        <a th:href="@{/}">Cinema</a>
+        <a th:href="@{/}">Absolute cinema</a>
     </div>
 
     <nav>
@@ -29,13 +29,13 @@
     <div class="auth">
         <!-- Ссылка "Login" только для гостя -->
         <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
+           th:href="@{/login}">Войти</a>
 
         <!-- Имя + Logout для авторизованного -->
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
+                <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
     </div>
@@ -100,6 +100,6 @@
         </p>
     </section>
 </main>
-
+<script th:src="@{/js/theme.js}"></script>
 </body>
 </html>

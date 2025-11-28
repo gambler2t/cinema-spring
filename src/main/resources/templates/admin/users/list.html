@@ -8,7 +8,7 @@
 
 <header class="topbar">
     <div class="brand">
-        <a th:href="@{/}">Cinema</a>
+        <a th:href="@{/}">Absolute cinema</a>
     </div>
     <nav>
         <a th:href="@{/movies}">Movies</a>
@@ -29,6 +29,9 @@
         <form th:action="@{/logout}" method="post" class="inline">
             <button type="submit" class="link-button">Logout</button>
         </form>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            🌙 Тёмная
+        </button>
     </div>
 </header>
 
@@ -67,6 +70,6 @@
         </tbody>
     </table>
 </main>
-
+<script th:src="@{/js/theme.js}"></script>
 </body>
 </html>
