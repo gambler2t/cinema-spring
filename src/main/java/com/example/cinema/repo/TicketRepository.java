@@ -16,4 +16,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     void deleteByUser_Id(Long userId);
 
     boolean existsByScreening_IdAndSeat(Long screeningId, String seat);
+
+    Ticket findByQrToken(String qrToken);
 }

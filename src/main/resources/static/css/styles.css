@@ -1843,3 +1843,78 @@ form.inline {
     box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
     transform: translateY(-1px);
 }
+
+.payment-section,
+.qr-section {
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.payment-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.payment-form .form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.payment-form .form-group.small {
+    flex: 1;
+}
+
+.payment-form input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.payment-form input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.payment-qr-info {
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.alert.alert-danger {
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #b91c1c;
+    margin-bottom: 1rem;
+}
+
+.qr-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.qr-card {
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    padding: 1rem;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.qr-card__image img {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+}
+

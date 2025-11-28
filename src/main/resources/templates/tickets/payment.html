@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Оплата билетов</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Фильмы</a>
+        <a th:href="@{/about}">О кинотеатре</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">Мои билеты</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
+        </span>
+    </nav>
+</header>
+
+<main class="container booking-page">
+    <h1>Оплата билетов</h1>
+
+    <section class="ticket-screening-info">
+        <p><span class="tag">Фильм:</span>
+            <strong th:text="${screening.movie.title}">Название фильма</strong></p>
+        <p><span class="tag">Начало:</span>
+            <span th:text="${#temporals.format(screening.startTime, 'dd.MM.yyyy HH:mm')}"></span></p>
+        <p><span class="tag">Зал:</span>
+            <span th:text="${screening.hall}"></span></p>
+        <p><span class="tag">Места:</span>
+            <span th:each="s : ${selectedSeats}"
+                  th:text="${s} + ' '">1-1 </span>
+        </p>
+        <p>
+            <span class="tag">Билетов:</span>
+            <strong th:text="${ticketsCount}">0</strong>
+            &nbsp;&nbsp;
+            <span class="tag">Итого:</span>
+            <strong th:text="${#numbers.formatDecimal(totalPrice, 1, 2)}">0.00</strong> руб.
+        </p>
+    </section>
+
+    <section class="payment-section">
+        <h2>Данные для оплаты</h2>
+
+        <div th:if="${emailError != null}" class="alert alert-danger"
+             th:text="${emailError}">Ошибка</div>
+
+        <form th:action="@{/tickets/pay}" method="post" class="payment-form">
+            <!-- скрытые поля -->
+            <input type="hidden" name="screeningId" th:value="${screening.id}"/>
+            <input type="hidden" name="selectedSeats" th:value="${selectedSeatsRaw}"/>
+
+            <div class="form-group">
+                <label for="customerName">Имя на билете</label>
+                <input id="customerName" type="text" name="customerName"
+                       th:value="${customerName}" required/>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cardNumber">Номер карты</label>
+                    <input id="cardNumber" type="text" maxlength="19"
+                           autocomplete="off"
+                           inputmode="numeric"
+                           placeholder="0000 0000 0000 0000" required/>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group small">
+                    <label for="cardExpiry">Срок действия</label>
+                    <input id="cardExpiry" type="text" maxlength="5"
+                           autocomplete="off"
+                           inputmode="numeric"
+                           placeholder="MM/YY" required/>
+                </div>
+                <div class="form-group small">
+                    <label for="cardCvv">CVV</label>
+                    <input id="cardCvv" type="password" maxlength="4"
+                           autocomplete="off"
+                           inputmode="numeric"
+                           placeholder="***" required/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Электронная почта</label>
+
+                <!-- Для авторизованного пользователя e-mail не обязателен -->
+                <input type="email" name="email"
+                       th:if="${isAuthenticated}"
+                       th:value="${prefilledEmail}"
+                       placeholder="Электронная почта (необязательно)"/>
+
+                <!-- Для гостя e-mail обязателен -->
+                <input type="email" name="email"
+                       th:if="${!isAuthenticated}"
+                       th:value="${prefilledEmail}"
+                       placeholder="Электронная почта (обязательно для получения билетов)"
+                       required/>
+                <small class="hint">На этот адрес мы отправим ваши билеты с QR-кодами.</small>
+            </div>
+
+            <div class="payment-qr-info">
+                <p>После оплаты на экране появятся QR-коды билетов.
+                    Вы также можете отсканировать их со своего телефона на входе в зал.</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    Оплатить [[${#numbers.formatDecimal(totalPrice, 1, 2)}]] руб.
+                </button>
+                <a th:href="@{/tickets/book/{id}(id=${screening.id})}"
+                   class="btn btn-outline">Вернуться к выбору мест</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<!-- Маски ввода для номера карты и даты -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var cardNumberInput = document.getElementById('cardNumber');
+        var cardExpiryInput = document.getElementById('cardExpiry');
+        var cardCvvInput = document.getElementById('cardCvv');
+
+        if (cardNumberInput) {
+            // Разрешаем только цифры + служебные клавиши
+            cardNumberInput.addEventListener('keydown', function (e) {
+                var allowedKeys = [
+                    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight',
+                    'Tab', 'Home', 'End'
+                ];
+                if (allowedKeys.indexOf(e.key) !== -1) {
+                    return;
+                }
+                if (!/^\d$/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Форматирование: 1111111111111111 -> 1111 1111 1111 1111
+            cardNumberInput.addEventListener('input', function () {
+                var value = cardNumberInput.value.replace(/\D/g, ''); // только цифры
+                if (value.length > 16) {
+                    value = value.substring(0, 16);
+                }
+                var parts = [];
+                for (var i = 0; i < value.length; i += 4) {
+                    parts.push(value.substring(i, i + 4));
+                }
+                cardNumberInput.value = parts.join(' ');
+            });
+        }
+
+        if (cardExpiryInput) {
+            // Разрешаем только цифры + служебные клавиши
+            cardExpiryInput.addEventListener('keydown', function (e) {
+                var allowedKeys = [
+                    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight',
+                    'Tab', 'Home', 'End'
+                ];
+                if (allowedKeys.indexOf(e.key) !== -1) {
+                    return;
+                }
+                if (!/^\d$/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Форматирование: 1130 -> 11/30
+            cardExpiryInput.addEventListener('input', function () {
+                var value = cardExpiryInput.value.replace(/\D/g, ''); // только цифры
+                if (value.length > 4) {
+                    value = value.substring(0, 4);
+                }
+
+                if (value.length >= 3) {
+                    cardExpiryInput.value =
+                        value.substring(0, 2) + '/' + value.substring(2);
+                } else {
+                    cardExpiryInput.value = value;
+                }
+            });
+        }
+
+        if (cardCvvInput) {
+            // Только цифры в CVV
+            cardCvvInput.addEventListener('keydown', function (e) {
+                var allowedKeys = [
+                    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight',
+                    'Tab', 'Home', 'End'
+                ];
+                if (allowedKeys.indexOf(e.key) !== -1) {
+                    return;
+                }
+                if (!/^\d$/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

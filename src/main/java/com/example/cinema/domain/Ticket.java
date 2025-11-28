@@ -16,7 +16,7 @@ public class Ticket {
     @JoinColumn(name = "screening_id")
     private Screening screening;
 
-    // владелец билета (пользователь)
+    // владелец билета (пользователь) - может быть null для гостя
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private AppUser user;
@@ -26,6 +26,13 @@ public class Ticket {
 
     @NotBlank
     private String seat;
+
+    // Email покупателя (для гостей обязателен, для пользователя можно пустой)
+    private String email;
+
+    // Уникальный токен, который кодируем в QR
+    @Column(name = "qr_token", unique = true, length = 64)
+    private String qrToken;
 
     public Ticket() {
     }
@@ -77,5 +84,21 @@ public class Ticket {
 
     public void setSeat(String seat) {
         this.seat = seat;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getQrToken() {
+        return qrToken;
+    }
+
+    public void setQrToken(String qrToken) {
+        this.qrToken = qrToken;
     }
 }

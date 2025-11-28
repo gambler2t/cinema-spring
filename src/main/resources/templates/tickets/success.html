@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Билеты оформлены</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Фильмы</a>
+        <a th:href="@{/about}">О кинотеатре</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">Мои билеты</a>
+        </span>
+    </nav>
+</header>
+
+<main class="container booking-page">
+    <h1>Покупка успешно завершена</h1>
+
+    <section class="ticket-screening-info">
+        <p><span class="tag">Фильм:</span>
+            <strong th:text="${screening.movie.title}">Название фильма</strong></p>
+        <p><span class="tag">Начало:</span>
+            <span th:text="${#temporals.format(screening.startTime, 'dd.MM.yyyy HH:mm')}"></span></p>
+        <p><span class="tag">Зал:</span>
+            <span th:text="${screening.hall}"></span></p>
+        <p>
+            <span class="tag">Билетов:</span>
+            <strong th:text="${ticketsCount}">0</strong>
+            &nbsp;&nbsp;
+            <span class="tag">Итого оплачено:</span>
+            <strong th:text="${#numbers.formatDecimal(totalPrice, 1, 2)}">0.00</strong> руб.
+        </p>
+        <p th:if="${emailUsed != null}">
+            Билеты также отправлены на e-mail:
+            <strong th:text="${emailUsed}">mail@example.com</strong>
+        </p>
+    </section>
+
+    <section class="qr-section">
+        <h2>Ваши QR-коды</h2>
+        <p>Покажите любой из этих QR-кодов контролёру при входе в зал.</p>
+
+        <div class="qr-grid">
+            <div class="qr-card" th:each="t : ${tickets}">
+                <div class="qr-card__info">
+                    <p>
+                        <strong th:text="'Место: ' + ${t.seat}">Ряд 1, место 1</strong><br/>
+                        <span th:text="${t.customerName}">Имя</span>
+                    </p>
+                </div>
+                <div class="qr-card__image">
+                    <img th:src="'data:image/png;base64,' + ${qrCodes[t.id]}"
+                         alt="QR-код билета">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ticket-form-section">
+        <div class="form-actions">
+            <a th:href="@{/movies}" class="btn btn-primary">К фильмам</a>
+            <a th:if="${#authorization.expression('hasRole(''USER'')')}"
+               th:href="@{/user/profile}"
+               class="btn btn-secondary">В профиль</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
