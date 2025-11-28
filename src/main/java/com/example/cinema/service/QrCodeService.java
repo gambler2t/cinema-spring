@@ -16,7 +16,14 @@ import java.util.Base64;
 @Service
 public class QrCodeService {
 
+    // Для success-страницы и писем
     public String generateQrBase64(String text, int width, int height) {
+        byte[] bytes = generateQrBytes(text, width, height);
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    // Для отдачи PNG по /tickets/qr/{id}
+    public byte[] generateQrBytes(String text, int width, int height) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bm = writer.encode(text, BarcodeFormat.QR_CODE, width, height);
@@ -25,7 +32,7 @@ public class QrCodeService {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
 
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
+            return baos.toByteArray();
         } catch (WriterException | IOException e) {
             throw new RuntimeException("Ошибка генерации QR-кода", e);
         }

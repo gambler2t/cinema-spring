@@ -15,6 +15,9 @@
             <a th:href="@{/user/profile}">Профиль</a>
             <a th:href="@{/user/favorites}">Избранное</a>
         </span>
+        <span th:if="${#authorization.expression('isAnonymous()')}">
+            <a th:href="@{/tickets/guest}">Мои билеты</a>
+        </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
             <a th:href="@{/admin/movies}">Админ</a>
         </span>

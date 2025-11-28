@@ -13,10 +13,27 @@
     <nav>
         <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
+
+        <span th:if="${#authorization.expression('isAnonymous()')}">
+            <a th:href="@{/tickets/guest}">Мои билеты</a>
+        </span>
+
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Мои билеты</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
         </span>
     </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Войти</a>
+
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Выйти</button>
+            </form>
+        </span>
+    </div>
 </header>
 
 <main class="container booking-page">
@@ -66,22 +83,18 @@
         <div class="form-actions">
             <a th:href="@{/movies}" class="btn btn-primary">К фильмам</a>
 
-            <!-- для авторизованного пользователя -->
             <a th:if="${#authorization.expression('hasRole(''USER'')')}"
                th:href="@{/user/profile}"
                class="btn btn-secondary">В профиль</a>
 
-            <!-- для гостя, если есть email -->
             <a th:if="${emailUsed != null and !#strings.isEmpty(emailUsed) and
-           #authorization.expression('isAnonymous()')}"
+                       #authorization.expression('isAnonymous()')}"
                th:href="@{/tickets/guest(email=${emailUsed})}"
                class="btn btn-outline">
                 Управлять билетами по e-mail
             </a>
-
         </div>
     </section>
-
 </main>
 
 </body>

@@ -24,7 +24,6 @@ public class EmailService {
                                  List<Ticket> tickets,
                                  Map<Long, String> qrBase64) {
 
-        // если e-mail не указан — просто выходим
         if (to == null || to.isBlank()) {
             return;
         }
@@ -65,15 +64,13 @@ public class EmailService {
 
             helper.setText(html.toString(), true);
 
-            // здесь может вылетать MailSendException, её тоже ловим
+            // Может бросить MailSendException
             mailSender.send(message);
 
         } catch (MessagingException | MailException e) {
-            // В режиме разработки просто логируем и продолжаем,
-            // чтобы покупка не падала из-за почты.
+            // В разработке просто логируем, чтобы покупка не падала
             e.printStackTrace();
         } catch (Exception e) {
-            // на всякий пожарный, чтобы вообще НИЧЕГО из почты не сломало покупку
             e.printStackTrace();
         }
     }

@@ -8,6 +8,9 @@ import com.example.cinema.repo.ScreeningRepository;
 import com.example.cinema.repo.TicketRepository;
 import com.example.cinema.service.EmailService;
 import com.example.cinema.service.QrCodeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +48,6 @@ public class TicketController {
 
     // ================= ШАГ 1. ВЫБОР МЕСТ =================
 
-    // Доступен и гостю, и авторизованному
     @GetMapping("/book/{screeningId}")
     public String showBookingForm(@PathVariable Long screeningId,
                                   Model model,
@@ -57,7 +59,6 @@ public class TicketController {
         Ticket ticket = new Ticket();
         ticket.setScreening(screening);
 
-        // имя подставляем, если пользователь залогинен
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             userRepository.findByUsername(username).ifPresent(user -> {
@@ -166,7 +167,6 @@ public class TicketController {
             }
         }
 
-        // Для гостя email обязателен
         if (!isAuthenticated && (email == null || email.isBlank())) {
             model.addAttribute("emailError", "Для покупки без регистрации укажите электронную почту.");
 
@@ -182,7 +182,7 @@ public class TicketController {
             return "tickets/payment";
         }
 
-        // тут могла бы быть реальная платёжка :) сейчас считаем, что оплата прошла
+        // тут могла бы быть реальная платёжка :)
 
         List<Ticket> createdTickets = new ArrayList<>();
 
@@ -205,7 +205,6 @@ public class TicketController {
             return "redirect:/tickets/book/" + screeningId + "?occupied";
         }
 
-        // генерируем QR-коды
         Map<Long, String> qrCodes = new HashMap<>();
         for (Ticket t : createdTickets) {
             String text = "TICKET:" + t.getQrToken();
@@ -213,7 +212,6 @@ public class TicketController {
             qrCodes.put(t.getId(), base64);
         }
 
-        // отправка на почту (если e-mail есть и почта настроена)
         if (email != null && !email.isBlank()) {
             emailService.sendTicketsEmail(email, createdTickets, qrCodes);
         }
@@ -230,7 +228,6 @@ public class TicketController {
 
     // ================= ГОСТЕВОЕ УПРАВЛЕНИЕ БИЛЕТАМИ =================
 
-    // Форма поиска билетов по e-mail + список билетов
     @GetMapping("/guest")
     public String showGuestTickets(@RequestParam(value = "email", required = false) String email,
                                    Model model) {
@@ -249,7 +246,6 @@ public class TicketController {
         return "tickets/guest-tickets";
     }
 
-    // Сдать один билет гостем
     @PostMapping("/guest/cancel/{id}")
     public String cancelGuestTicket(@PathVariable Long id,
                                     @RequestParam("email") String email) {
@@ -265,7 +261,6 @@ public class TicketController {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // Проверяем, что e-mail совпадает и сеанс ещё не начался
         if (ticket.getEmail() == null
                 || !ticket.getEmail().equalsIgnoreCase(email)
                 || !ticket.getScreening().getStartTime().isAfter(now)) {
@@ -276,5 +271,35 @@ public class TicketController {
         ticketRepository.delete(ticket);
 
         return "redirect:/tickets/guest?email=" + encodedEmail + "&cancelled=1";
+    }
+
+    // ================= QR-код для билета пользователя =================
+
+    @GetMapping("/qr/{id}")
+    public ResponseEntity<byte[]> getTicketQr(@PathVariable Long id,
+                                              Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        if (ticket == null || ticket.getUser() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String username = authentication.getName();
+        AppUser user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || !user.getId().equals(ticket.getUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String text = "TICKET:" + ticket.getQrToken();
+        byte[] png = qrCodeService.generateQrBytes(text, 220, 220);
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(png);
     }
 }

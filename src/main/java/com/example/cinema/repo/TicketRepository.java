@@ -18,10 +18,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     boolean existsByScreening_IdAndSeat(Long screeningId, String seat);
 
-    // если где-то пригодится поиск по токену
+    // Поиск по токену QR (если понадобится)
     Ticket findByQrToken(String qrToken);
 
-    // все будущие билеты, купленные на этот e-mail, отсортированные по времени
+    // Билеты гостя по e-mail, только будущие, по времени
     List<Ticket> findByEmailAndScreening_StartTimeAfterOrderByScreening_StartTimeAsc(
             String email,
             LocalDateTime startTime

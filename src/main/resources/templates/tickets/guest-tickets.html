@@ -13,10 +13,27 @@
     <nav>
         <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
+
+        <span th:if="${#authorization.expression('isAnonymous()')}">
+            <a th:href="@{/tickets/guest}">Мои билеты</a>
+        </span>
+
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Мои билеты</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
         </span>
     </nav>
+    <div class="auth">
+        <a th:if="${#authorization.expression('isAnonymous()')}"
+           th:href="@{/login}">Войти</a>
+
+        <span th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}">user</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="link-button">Выйти</button>
+            </form>
+        </span>
+    </div>
 </header>
 
 <main class="container booking-page">
@@ -45,7 +62,6 @@
             </div>
         </form>
 
-        <!-- сообщения об успешном/неуспешном возврате -->
         <div th:if="${param.cancelled}" class="alert alert-success">
             Билет успешно возвращён. Деньги будут зачислены по правилам кинотеатра.
         </div>
@@ -55,7 +71,7 @@
     </section>
 
     <section class="payment-section" th:if="${email != null and !#strings.isEmpty(email)}">
-    <h2 th:text="'Ближайшие билеты для ' + ${email}">Билеты</h2>
+        <h2 th:text="'Ближайшие билеты для ' + ${email}">Билеты</h2>
 
         <div th:if="${#lists.isEmpty(tickets)}">
             <p>На этот адрес не найдено активных билетов.</p>

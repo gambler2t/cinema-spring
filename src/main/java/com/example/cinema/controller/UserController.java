@@ -43,23 +43,19 @@ public class UserController {
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
-        // Все билеты пользователя
         List<Ticket> allTickets = ticketRepository.findByUser_Username(username);
         LocalDateTime now = LocalDateTime.now();
 
-        // Ближайшие сеансы
         List<Ticket> upcomingTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isAfter(now))
                 .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
                 .collect(Collectors.toList());
 
-        // Прошедшие сеансы
         List<Ticket> pastTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isBefore(now))
                 .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
                 .collect(Collectors.toList());
 
-        // Последние избранные
         List<Movie> recentFavorites = user.getFavoriteMovies().stream()
                 .sorted(Comparator.comparing(Movie::getId).reversed())
                 .limit(4)
@@ -93,11 +89,19 @@ public class UserController {
     @PostMapping("/tickets/{id}/delete")
     public String deleteTicket(@PathVariable Long id, Principal principal) {
 
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
         Ticket ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null && ticket.getUser() != null) {
             String currentUser = principal.getName();
+
             if (currentUser.equals(ticket.getUser().getUsername())) {
-                ticketRepository.delete(ticket);
+                LocalDateTime now = LocalDateTime.now();
+                if (ticket.getScreening().getStartTime().isAfter(now)) {
+                    ticketRepository.delete(ticket);
+                }
             }
         }
 
@@ -118,7 +122,6 @@ public class UserController {
                                  Principal principal,
                                  HttpServletRequest request) {
 
-        // Логика добавления/удаления из избранного
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -133,7 +136,6 @@ public class UserController {
 
         userRepository.save(user);
 
-        // Редирект на предыдущую страницу
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/movies");
     }

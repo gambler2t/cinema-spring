@@ -11,32 +11,38 @@
         <a th:href="@{/}">Cinema</a>
     </div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
 
+        <!-- Для гостей: Мои билеты по e-mail -->
+        <span th:if="${#authorization.expression('isAnonymous()')}">
+            <a th:href="@{/tickets/guest}">Мои билеты</a>
+        </span>
+
+        <!-- Для авторизованных: профиль и избранное -->
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
             <a th:href="@{/user/favorites}">Избранное</a>
         </span>
 
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin</a>
+            <a th:href="@{/admin/movies}">Админ</a>
         </span>
     </nav>
     <div class="auth">
         <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
+           th:href="@{/login}">Войти</a>
 
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
+                <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
     </div>
 </header>
 
-<main class="container">
+<main class="container booking-page">
     <h1>Избранные фильмы</h1>
 
     <div th:if="${#lists.isEmpty(favorites)}">
@@ -47,17 +53,22 @@
         <div class="movie-card" th:each="movie : ${favorites}">
             <div class="movie-poster">
                 <img th:if="${movie.posterUrl != null}"
-                     th:src="${movie.posterUrl}" alt="Poster">
+                     th:src="${movie.posterUrl}" alt="Постер">
                 <div th:if="${movie.posterUrl == null}"
                      class="movie-poster-placeholder">
-                    NO POSTER
+                    НЕТ ПОСТЕРА
                 </div>
             </div>
 
             <div class="movie-content">
-                <h3 th:text="${movie.title}">Title</h3>
-                <p class="movie-genre" th:text="${movie.genre}">Genre</p>
-                <p class="movie-desc" th:text="${movie.shortDescription}">Short desc</p>
+                <h3 th:text="${movie.title}">Название</h3>
+                <p class="movie-genre" th:text="${movie.genre}">Жанр</p>
+
+                <!-- Используем существующее поле description и сокращаем -->
+                <p class="movie-desc"
+                   th:text="${#strings.abbreviate(movie.description, 120)}">
+                    Краткое описание
+                </p>
             </div>
 
             <div class="movie-footer">
@@ -78,6 +89,6 @@
         </div>
     </div>
 </main>
-<script th:src="@{/js/favorites.js}"></script>
+
 </body>
 </html>
