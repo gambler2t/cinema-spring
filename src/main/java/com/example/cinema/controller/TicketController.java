@@ -12,8 +12,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,9 +43,9 @@ public class TicketController {
         this.emailService = emailService;
     }
 
-    // ================= Шаг 1. Выбор мест =================
+    // ================= ШАГ 1. ВЫБОР МЕСТ =================
 
-    // Больше НЕ ограничиваем только USER — гость тоже может бронировать
+    // Доступен и гостю, и авторизованному
     @GetMapping("/book/{screeningId}")
     public String showBookingForm(@PathVariable Long screeningId,
                                   Model model,
@@ -51,12 +54,11 @@ public class TicketController {
         Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new IllegalArgumentException("Screening not found: " + screeningId));
 
-        // Пустой билет для формы
         Ticket ticket = new Ticket();
         ticket.setScreening(screening);
 
-        // Заполняем имя пользователя, если залогинен
-        if (authentication != null) {
+        // имя подставляем, если пользователь залогинен
+        if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             userRepository.findByUsername(username).ifPresent(user -> {
                 if (user.getFullName() != null && !user.getFullName().isBlank()) {
@@ -87,7 +89,7 @@ public class TicketController {
         return "tickets/book";
     }
 
-    // Теперь этот метод просто показывает страницу оплаты
+    // После выбора мест показываем страницу оплаты
     @PostMapping("/book")
     public String showPaymentPage(@ModelAttribute("ticket") Ticket ticketTemplate,
                                   @RequestParam("selectedSeats") String selectedSeatsRaw,
@@ -95,7 +97,6 @@ public class TicketController {
                                   Model model) {
 
         if (selectedSeatsRaw == null || selectedSeatsRaw.isBlank()) {
-            // если нет мест — обратно на выбор
             return "redirect:/tickets/book/" + ticketTemplate.getScreening().getId();
         }
 
@@ -133,7 +134,7 @@ public class TicketController {
         return "tickets/payment";
     }
 
-    // ================= Шаг 2. Оплата и создание билетов =================
+    // ================= ШАГ 2. ОПЛАТА И СОЗДАНИЕ БИЛЕТОВ =================
 
     @PostMapping("/pay")
     public String processPayment(@RequestParam("screeningId") Long screeningId,
@@ -160,13 +161,12 @@ public class TicketController {
 
         if (isAuthenticated) {
             user = userRepository.findByUsername(authentication.getName()).orElse(null);
-            // если email не указан в форме — попробуем взять из профиля
             if ((email == null || email.isBlank()) && user != null) {
                 email = user.getEmail();
             }
         }
 
-        // Для гостя email ОБЯЗАТЕЛЕН
+        // Для гостя email обязателен
         if (!isAuthenticated && (email == null || email.isBlank())) {
             model.addAttribute("emailError", "Для покупки без регистрации укажите электронную почту.");
 
@@ -182,21 +182,18 @@ public class TicketController {
             return "tickets/payment";
         }
 
-        // Здесь должна быть интеграция с платёжкой. Сейчас просто считаем, что оплата прошла успешно.
+        // тут могла бы быть реальная платёжка :) сейчас считаем, что оплата прошла
 
         List<Ticket> createdTickets = new ArrayList<>();
 
         for (String seat : selectedSeats) {
-            // проверим, что место ещё свободно
             if (!ticketRepository.existsByScreening_IdAndSeat(screeningId, seat)) {
                 Ticket ticket = new Ticket();
                 ticket.setScreening(screening);
-                ticket.setUser(user);   // null для гостя
+                ticket.setUser(user); // null для гостя
                 ticket.setCustomerName(customerName);
                 ticket.setSeat(seat);
                 ticket.setEmail(email);
-
-                // уникальный токен для QR
                 ticket.setQrToken(UUID.randomUUID().toString());
 
                 ticketRepository.save(ticket);
@@ -205,11 +202,10 @@ public class TicketController {
         }
 
         if (createdTickets.isEmpty()) {
-            // все места уже заняты – редирект обратно к выбору
             return "redirect:/tickets/book/" + screeningId + "?occupied";
         }
 
-        // генерируем QR-коды (по одному на каждый билет)
+        // генерируем QR-коды
         Map<Long, String> qrCodes = new HashMap<>();
         for (Ticket t : createdTickets) {
             String text = "TICKET:" + t.getQrToken();
@@ -217,12 +213,11 @@ public class TicketController {
             qrCodes.put(t.getId(), base64);
         }
 
-        // письмо на почту (если email есть)
+        // отправка на почту (если e-mail есть и почта настроена)
         if (email != null && !email.isBlank()) {
             emailService.sendTicketsEmail(email, createdTickets, qrCodes);
         }
 
-        // показываем страницу успешной оплаты с QR-кодами
         model.addAttribute("screening", screening);
         model.addAttribute("tickets", createdTickets);
         model.addAttribute("qrCodes", qrCodes);
@@ -231,5 +226,55 @@ public class TicketController {
         model.addAttribute("emailUsed", email);
 
         return "tickets/success";
+    }
+
+    // ================= ГОСТЕВОЕ УПРАВЛЕНИЕ БИЛЕТАМИ =================
+
+    // Форма поиска билетов по e-mail + список билетов
+    @GetMapping("/guest")
+    public String showGuestTickets(@RequestParam(value = "email", required = false) String email,
+                                   Model model) {
+
+        List<Ticket> tickets = Collections.emptyList();
+
+        if (email != null && !email.isBlank()) {
+            LocalDateTime now = LocalDateTime.now();
+            tickets = ticketRepository
+                    .findByEmailAndScreening_StartTimeAfterOrderByScreening_StartTimeAsc(email, now);
+        }
+
+        model.addAttribute("email", email);
+        model.addAttribute("tickets", tickets);
+
+        return "tickets/guest-tickets";
+    }
+
+    // Сдать один билет гостем
+    @PostMapping("/guest/cancel/{id}")
+    public String cancelGuestTicket(@PathVariable Long id,
+                                    @RequestParam("email") String email) {
+
+        String encodedEmail = email != null
+                ? UriUtils.encode(email, StandardCharsets.UTF_8)
+                : "";
+
+        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        if (ticket == null) {
+            return "redirect:/tickets/guest?email=" + encodedEmail + "&error=notfound";
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // Проверяем, что e-mail совпадает и сеанс ещё не начался
+        if (ticket.getEmail() == null
+                || !ticket.getEmail().equalsIgnoreCase(email)
+                || !ticket.getScreening().getStartTime().isAfter(now)) {
+
+            return "redirect:/tickets/guest?email=" + encodedEmail + "&error=notallowed";
+        }
+
+        ticketRepository.delete(ticket);
+
+        return "redirect:/tickets/guest?email=" + encodedEmail + "&cancelled=1";
     }
 }

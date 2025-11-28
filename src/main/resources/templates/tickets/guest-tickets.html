@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Мои билеты (гость)</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <a th:href="@{/}">Cinema</a>
+    </div>
+    <nav>
+        <a th:href="@{/movies}">Фильмы</a>
+        <a th:href="@{/about}">О кинотеатре</a>
+        <span th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a th:href="@{/user/profile}">Мои билеты</a>
+        </span>
+    </nav>
+</header>
+
+<main class="container booking-page">
+    <h1>Мои билеты без входа в аккаунт</h1>
+
+    <section class="payment-section">
+        <h2>Найти билеты по e-mail</h2>
+
+        <p class="hint">
+            Укажите электронную почту, на которую вы оформляли покупку.
+            Мы покажем все будущие сеансы с этим адресом.
+        </p>
+
+        <form method="get" th:action="@{/tickets/guest}" class="payment-form">
+            <div class="form-group">
+                <label for="email">Электронная почта</label>
+                <input id="email"
+                       type="email"
+                       name="email"
+                       th:value="${email}"
+                       placeholder="example@mail.com"
+                       required>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Найти билеты</button>
+            </div>
+        </form>
+
+        <!-- сообщения об успешном/неуспешном возврате -->
+        <div th:if="${param.cancelled}" class="alert alert-success">
+            Билет успешно возвращён. Деньги будут зачислены по правилам кинотеатра.
+        </div>
+        <div th:if="${param.error}" class="alert alert-danger">
+            Не удалось вернуть билет. Возможно, сеанс уже начался или данные не совпадают.
+        </div>
+    </section>
+
+    <section class="payment-section" th:if="${email != null and !#strings.isEmpty(email)}">
+    <h2 th:text="'Ближайшие билеты для ' + ${email}">Билеты</h2>
+
+        <div th:if="${#lists.isEmpty(tickets)}">
+            <p>На этот адрес не найдено активных билетов.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(tickets)}" class="qr-grid">
+            <div class="qr-card" th:each="t : ${tickets}">
+                <div class="qr-card__info">
+                    <p>
+                        <strong th:text="${t.screening.movie.title}">Фильм</strong><br/>
+                        <span th:text="${#temporals.format(t.screening.startTime, 'dd.MM.yyyy HH:mm')}">
+                            01.01.2025 19:00
+                        </span><br/>
+                        <span th:text="'Зал ' + ${t.screening.hall} + ', место ' + ${t.seat}">
+                            Зал 1, место 1
+                        </span>
+                    </p>
+                </div>
+
+                <form th:action="@{/tickets/guest/cancel/{id}(id=${t.id})}"
+                      method="post"
+                      onsubmit="return confirm('Сдать этот билет?');">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <button type="submit" class="btn btn-secondary">
+                        Сдать билет
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

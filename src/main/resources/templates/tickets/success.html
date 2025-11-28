@@ -65,11 +65,23 @@
     <section class="ticket-form-section">
         <div class="form-actions">
             <a th:href="@{/movies}" class="btn btn-primary">К фильмам</a>
+
+            <!-- для авторизованного пользователя -->
             <a th:if="${#authorization.expression('hasRole(''USER'')')}"
                th:href="@{/user/profile}"
                class="btn btn-secondary">В профиль</a>
+
+            <!-- для гостя, если есть email -->
+            <a th:if="${emailUsed != null and !#strings.isEmpty(emailUsed) and
+           #authorization.expression('isAnonymous()')}"
+               th:href="@{/tickets/guest(email=${emailUsed})}"
+               class="btn btn-outline">
+                Управлять билетами по e-mail
+            </a>
+
         </div>
     </section>
+
 </main>
 
 </body>
