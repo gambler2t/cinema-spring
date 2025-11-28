@@ -58,8 +58,6 @@
                         В избранное
                     </button>
                 </form>
-
-                <!-- Для неавторизованных - ничего не показываем -->
             </div>
 
             <p><strong>Жанр:</strong>
@@ -87,53 +85,159 @@
         </p>
     </section>
 
+    <!-- НОВЫЙ БЛОК С СЕАНСАМИ -->
     <section class="screenings" th:if="${not availableDates.empty}">
         <h2>Сеансы</h2>
-        <div>
-            <strong>Выберите дату:</strong>
-            <form method="get" th:action="@{/movies/{id}(id=${movie.id})}">
-                <select name="date" onchange="this.form.submit()">
-                    <option th:each="date : ${availableDates}"
-                            th:value="${date}"
-                            th:text="${date}"
-                            th:selected="${date == selectedDate}">
-                    </option>
-                </select>
-            </form>
+
+        <!-- верхняя панель: даты + фильтр по времени -->
+        <div class="screenings-header">
+            <!-- Даты (горизонтальный список) -->
+            <div class="screenings-dates">
+                <a th:each="date : ${availableDates}"
+                   th:href="@{/movies/{id}(id=${movie.id}, date=${date})}"
+                   class="date-pill"
+                   th:classappend="${date} == ${selectedDate} ? ' date-pill--active' : ''">
+                    <span class="date-pill__day"
+                          th:text="${#temporals.format(date, 'dd')}">28</span>
+                    <span class="date-pill__month"
+                          th:text="${#temporals.format(date, 'MMM')}">ноя</span>
+                </a>
+            </div>
+
+            <!-- Фильтр по времени дня -->
+            <div class="screenings-filter">
+                <button type="button" class="filter-btn" id="timeFilterBtn">
+                    <span id="timeFilterLabel">Весь день</span>
+                    <span class="filter-btn__icon">⌄</span>
+                </button>
+                <div class="filter-menu" id="timeFilterMenu">
+                    <button type="button" class="filter-menu__item"
+                            data-filter="all" data-label="Весь день">
+                        Весь день
+                    </button>
+                    <button type="button" class="filter-menu__item"
+                            data-filter="morning" data-label="Утро">
+                        Утро 06:00 – 12:00
+                    </button>
+                    <button type="button" class="filter-menu__item"
+                            data-filter="day" data-label="День">
+                        День 12:00 – 18:00
+                    </button>
+                    <button type="button" class="filter-menu__item"
+                            data-filter="evening" data-label="Вечер">
+                        Вечер 18:00 – 00:00
+                    </button>
+                    <button type="button" class="filter-menu__item"
+                            data-filter="night" data-label="После полуночи">
+                        После полуночи
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div th:if="${not screeningsForDay.empty}">
-            <h3>Сеансы на <span th:text="${selectedDate}">дату</span>:</h3>
-            <ul class="screenings-list">
-                <li th:each="screening : ${screeningsForDay}">
-                    <span class="screening-time"
-                          th:text="${#temporals.format(screening.startTime, 'HH:mm')}">
-                        19:00
-                    </span>
-                    <span class="screening-hall" th:text="'Зал: ' + ${screening.hall}">
-                        Зал: 1
-                    </span>
-                    <span class="screening-price"
-                          th:text="${screening.price != null ? screening.price + ' руб.' : 'Цена не указана'}">
-                        500 руб.
-                    </span>
-                    <a th:href="@{/tickets/book/{screeningId}(screeningId=${screening.id})}"
-                       class="btn btn-primary btn-small">
-                        Купить билет
-                    </a>
-                </li>
-            </ul>
+            <p class="screenings-subtitle">
+                Сеансы на
+                <span th:text="${#temporals.format(selectedDate, 'dd.MM.yyyy')}">дату</span>:
+            </p>
+
+            <!-- Карточки залов с временем -->
+            <div class="screenings-halls">
+                <div class="hall-card" th:each="hallEntry : ${screeningsByHall}">
+                    <div class="hall-card__header">
+                        <span class="hall-card__title"
+                              th:text="'Зал ' + ${hallEntry.key}">Зал 1</span>
+                    </div>
+                    <div class="hall-card__times">
+                        <a th:each="screening : ${hallEntry.value}"
+                           class="time-chip"
+                           th:href="@{/tickets/book/{screeningId}(screeningId=${screening.id})}"
+                           th:data-hour="${#temporals.format(screening.startTime, 'HH')}"
+                           th:title="'Купить билет на ' + ${#temporals.format(screening.startTime, 'HH:mm')}">
+                            <span class="time-chip__time"
+                                  th:text="${#temporals.format(screening.startTime, 'HH:mm')}">
+                                19:00
+                            </span>
+                            <span class="time-chip__price"
+                                  th:text="${screening.price != null ? 'от ' + #numbers.formatDecimal(screening.price, 1, 0) + ' руб.' : 'Цена уточняется'}">
+                                от 400 руб.
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div th:if="${screeningsForDay.empty}">
             <p>На выбранную дату сеансов нет.</p>
         </div>
     </section>
 
+    <!-- если вообще нет ни одной даты сеансов -->
     <section class="screenings" th:if="${availableDates.empty}">
         <h2>Сеансы</h2>
         <p>На данный момент сеансов для этого фильма нет.</p>
     </section>
 </main>
+
+<!-- JS-фильтр по времени дня -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var filterBtn = document.getElementById('timeFilterBtn');
+        var filterMenu = document.getElementById('timeFilterMenu');
+        var filterLabel = document.getElementById('timeFilterLabel');
+        var timeChips = document.querySelectorAll('.time-chip');
+
+        if (!filterBtn || !filterMenu) {
+            return;
+        }
+
+        // открыть / закрыть меню
+        filterBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            filterMenu.classList.toggle('open');
+        });
+
+        // клик вне меню закрывает его
+        document.addEventListener('click', function () {
+            filterMenu.classList.remove('open');
+        });
+
+        // выбор пункта фильтра
+        filterMenu.addEventListener('click', function (e) {
+            var item = e.target.closest('.filter-menu__item');
+            if (!item) return;
+
+            var filter = item.getAttribute('data-filter');
+            var label = item.getAttribute('data-label') || item.textContent.trim();
+
+            filterLabel.textContent = label;
+            applyTimeFilter(filter);
+            filterMenu.classList.remove('open');
+        });
+
+        function getSegmentByHour(hour) {
+            var h = parseInt(hour, 10);
+            if (h >= 6 && h < 12) return 'morning';   // 06-12
+            if (h >= 12 && h < 18) return 'day';      // 12-18
+            if (h >= 18 && h < 24) return 'evening';  // 18-00
+            return 'night';                           // 00-06
+        }
+
+        function applyTimeFilter(filter) {
+            timeChips.forEach(function (chip) {
+                var hourStr = chip.getAttribute('data-hour');
+                var segment = getSegmentByHour(hourStr || '0');
+
+                var visible = (filter === 'all' || filter === segment);
+                chip.style.display = visible ? 'inline-flex' : 'none';
+            });
+        }
+
+        // по умолчанию – "Весь день"
+        applyTimeFilter('all');
+    });
+</script>
 
 </body>
 </html>

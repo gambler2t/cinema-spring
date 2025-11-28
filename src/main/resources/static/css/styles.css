@@ -1626,3 +1626,220 @@ form.inline {
     color: #9ca3af !important;
     background: transparent !important;
 }
+
+/* --- блок сеансов на странице фильма --- */
+
+.screenings {
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.screenings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.screenings-dates {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.screenings-dates::-webkit-scrollbar {
+    height: 4px;
+}
+
+.screenings-dates::-webkit-scrollbar-thumb {
+    background: #cbd5f5;
+    border-radius: 999px;
+}
+
+.date-pill {
+    min-width: 76px;
+    padding: 0.45rem 0.7rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 1.1;
+    cursor: pointer;
+    text-decoration: none;
+    color: #111827;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.date-pill__day {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.date-pill__month {
+    text-transform: lowercase;
+    color: #6b7280;
+    letter-spacing: 0.02em;
+}
+
+/* ховер только для неактивных дат */
+.date-pill:not(.date-pill--active):hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+
+.date-pill--active {
+    background: linear-gradient(135deg, #3b82f6, #ec4899);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.35);
+}
+
+.date-pill--active .date-pill__month {
+    color: #e5e7eb;
+}
+
+/* фильтр по времени */
+
+.screenings-filter {
+    position: relative;
+}
+
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.85rem;
+    cursor: pointer;
+    min-width: 150px;
+    justify-content: space-between;
+}
+
+.filter-btn__icon {
+    font-size: 0.8rem;
+    transform: translateY(1px);
+}
+
+.filter-btn:hover {
+    background: #e5e7eb;
+}
+
+.filter-menu {
+    position: absolute;
+    right: 0;
+    margin-top: 0.35rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 15px 30px rgba(15, 23, 42, 0.18);
+    padding: 0.35rem 0;
+    min-width: 220px;
+    z-index: 30;
+    display: none;
+}
+
+.filter-menu.open {
+    display: block;
+}
+
+.filter-menu__item {
+    width: 100%;
+    text-align: left;
+    padding: 0.45rem 0.9rem;
+    background: transparent;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.filter-menu__item:hover {
+    background: #f3f4f6;
+}
+
+/* карточки залов и времена */
+
+.screenings-subtitle {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.screenings-halls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.hall-card {
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem 0.9rem;
+    background: #f9fafb;
+}
+
+.hall-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.hall-card__title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+.hall-card__times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* пилюли времени */
+
+.time-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    min-width: 88px;
+    transition: all 0.2s ease;
+}
+
+.time-chip__time {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.time-chip__price {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.time-chip:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}

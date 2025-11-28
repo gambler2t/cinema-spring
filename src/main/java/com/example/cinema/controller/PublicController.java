@@ -7,23 +7,19 @@ import com.example.cinema.dto.RegistrationForm;
 import com.example.cinema.repo.AppUserRepository;
 import com.example.cinema.repo.MovieRepository;
 import com.example.cinema.repo.ScreeningRepository;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -190,12 +186,21 @@ public class PublicController {
             selectedDate = !dates.isEmpty() ? dates.get(0) : null;
         }
 
-        // Фильтруем сеансы по выбранной дате
+        // Сеансы на выбранную дату + группировка по залам
         List<Screening> screeningsForDay = Collections.emptyList();
+        Map<String, List<Screening>> screeningsByHall = new LinkedHashMap<>();
+
         if (selectedDate != null) {
             screeningsForDay = upcoming.stream()
                     .filter(s -> s.getStartTime().toLocalDate().equals(selectedDate))
                     .collect(Collectors.toList());
+
+            screeningsByHall = screeningsForDay.stream()
+                    .collect(Collectors.groupingBy(
+                            Screening::getHall,
+                            LinkedHashMap::new,
+                            Collectors.toList()
+                    ));
         }
 
         // Проверка избранного для текущего пользователя
@@ -212,6 +217,7 @@ public class PublicController {
         model.addAttribute("availableDates", dates);
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("screeningsForDay", screeningsForDay);
+        model.addAttribute("screeningsByHall", screeningsByHall);
         model.addAttribute("isFavorite", isFavorite);
 
         return "movies/details";
