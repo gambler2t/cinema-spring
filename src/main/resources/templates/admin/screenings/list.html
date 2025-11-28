@@ -12,6 +12,7 @@
     <a th:href="@{/about}">О кинотеатре</a>
     <span th:if="${#authorization.expression('hasRole(''USER'')')}">
         <a th:href="@{/user/profile}">Профиль</a>
+        <a th:href="@{/user/favorites}">Избранное</a>
     </span>
 </p>
 
