@@ -26,12 +26,12 @@
     </nav>
     <div class="auth">
         <a th:if="${#authorization.expression('isAnonymous()')}"
-           th:href="@{/login}">Login</a>
+           th:href="@{/login}">Войти</a>
 
         <span th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}">user</span>
             <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="link-button">Logout</button>
+                <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
     </div>
@@ -42,9 +42,9 @@
 
     <section class="about-grid">
         <div class="about-card">
-            <h2>Кинотеатр «Cinema»</h2>
+            <h2>Кинотеатр «Absolute cinema»</h2>
             <p>
-                «Cinema» — современный городской кинотеатр с комфортными залами,
+                «Absolute cinema» — современный городской кинотеатр с комфортными залами,
                 свежими премьерами и удобной онлайн-бронированием билетов.
             </p>
             <p>
