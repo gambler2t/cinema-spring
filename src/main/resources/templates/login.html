@@ -14,6 +14,7 @@
     <nav>
         <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
+        <a th:href="@{/tickets/guest}">Мои билеты</a>
 
         <!-- Пункт "Профиль" — только для авторизованного USER -->
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
@@ -38,6 +39,9 @@
                 <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            🌙 Тёмная
+        </button>
     </div>
 </header>
 

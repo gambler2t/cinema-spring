@@ -21,7 +21,9 @@
             <a th:href="@{/tickets/guest}">Мои билеты</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin</a>
+            <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+            <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
+            <a th:href="@{/admin/users}">Админ: Пользователи</a>
         </span>
     </nav>
     <div class="auth">
@@ -34,6 +36,9 @@
                 <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            🌙 Тёмная
+        </button>
     </div>
 </header>
 
@@ -42,9 +47,9 @@
 
     <section class="about-grid">
         <div class="about-card">
-            <h2>Кинотеатр «Absolute cinema»</h2>
+            <h2>Кинотеатр «Cinema»</h2>
             <p>
-                «Absolute cinema» — современный городской кинотеатр с комфортными залами,
+                «Absolute Cinema» - современный городской кинотеатр с комфортными залами,
                 свежими премьерами и удобной онлайн-бронированием билетов.
             </p>
             <p>
@@ -82,7 +87,6 @@
             Рядом есть "Вкусно и точка" и "KFC".
         </p>
 
-        <!-- Пример iframe с Яндекс.Картой (можно заменить на свой код) -->
         <div class="map-wrapper">
             <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1512.2783376199252!2d39.8546568881842!3d57.58583153346284!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46b293e29c1e9a57%3A0x6f73252053671191!2z0K_RgNC-0YHQu9Cw0LLRgdC60LjQuSDQk9C-0YHRg9C00LDRgNGB0YLQstC10L3QvdGL0Lkg0KLQtdGF0L3QuNGH0LXRgdC60LjQuSDQo9C90LjQstC10YDRgdC40YLQtdGC!5e0!3m2!1sru!2sat!4v1764080665671!5m2!1sru!2sat"

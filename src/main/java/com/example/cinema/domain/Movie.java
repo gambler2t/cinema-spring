@@ -2,11 +2,11 @@ package com.example.cinema.domain;
 
 import jakarta.persistence.*;
 
-@Entity
+@Entity // Сущность JPA — таблица movie в базе (имя по умолчанию = Movie)
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоинкрементный первичный ключ
     private Long id;
 
     // Название фильма
@@ -16,11 +16,11 @@ public class Movie {
     private String genre;
 
     // Описание
-    @Column(length = 2000)
+    @Column(length = 2000) // Длинное текстовое поле, увеличиваем максимальную длину
     private String description;
 
     // Длительность в минутах
-    @Column(name = "duration_minutes")
+    @Column(name = "duration_minutes") // Явно задаём имя столбца в БД
     private Integer durationMinutes;
 
     // Режиссёр
@@ -30,7 +30,7 @@ public class Movie {
     private String country;
 
     // URL постера
-    @Column(name = "poster_url")
+    @Column(name = "poster_url") // Ссылка (путь) на картинку постера
     private String posterUrl;
 
     // ===== getters / setters =====

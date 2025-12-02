@@ -19,7 +19,9 @@
             <a th:href="@{/tickets/guest}">Мои билеты</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Админ</a>
+            <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+            <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
+            <a th:href="@{/admin/users}">Админ: Пользователи</a>
         </span>
     </nav>
     <div class="auth">

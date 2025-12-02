@@ -11,23 +11,24 @@
         <a th:href="@{/}">Absolute cinema</a>
     </div>
     <nav>
-        <a th:href="@{/movies}">Movies</a>
+        <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
 
         <span th:if="${#authorization.expression('hasRole(''USER'')')}">
             <a th:href="@{/user/profile}">Профиль</a>
+            <a th:href="@{/user/favorites}">Избранное</a>
         </span>
 
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Admin: Movies</a>
-            <a th:href="@{/admin/screenings}">Admin: Screenings</a>
-            <a th:href="@{/admin/users}">Admin: Users</a>
+            <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+            <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
+            <a th:href="@{/admin/users}">Админ: Пользователи</a>
         </span>
     </nav>
     <div class="auth">
         <span th:text="${#authentication.name}">admin</span>
         <form th:action="@{/logout}" method="post" class="inline">
-            <button type="submit" class="link-button">Logout</button>
+            <button type="submit" class="link-button">Выйти</button>
         </form>
         <button type="button" class="theme-toggle" onclick="toggleTheme()">
             🌙 Тёмная
@@ -62,7 +63,7 @@
                       class="inline"
                       onsubmit="return confirm('Удалить этого пользователя и все его билеты?');">
                     <button type="submit" class="btn btn-secondary btn-small">
-                        Delete
+                        Удалить
                     </button>
                 </form>
             </td>

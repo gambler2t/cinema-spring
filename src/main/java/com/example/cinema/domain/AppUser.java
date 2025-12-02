@@ -4,35 +4,35 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
+@Entity // Сущность JPA — будет таблицей в базе
+@Table(name = "users") // Явно указываем имя таблицы
 public class AppUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоинкрементный первичный ключ
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false) // Логин обязателен и должен быть уникален
     private String username;
 
-    private String password;
+    private String password; // Хранится в зашифрованном виде (BCrypt)
 
     private String fullName;
 
     private String email;
 
-    @Column(length = 1000)
+    @Column(length = 1000) // Ограничиваем длину bio в базе
     private String bio;
 
     // роли: USER, ADMIN и т.п.
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
+    @ElementCollection(fetch = FetchType.EAGER) // Коллекция простых значений (строки) вместо отдельной сущности
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id")) // Отдельная таблица ролей
+    @Column(name = "role") // Колонка, где хранится строковое значение роли
     private Set<String> roles = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany // Многие-ко-многим: пользователь ↔ любимые фильмы
     @JoinTable(
-            name = "favorite_movies",
+            name = "favorite_movies", // Промежуточная таблица для связи
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
@@ -48,7 +48,7 @@ public class AppUser {
     }
 
     public void addRole(String role) {
-        roles.add(role);
+        roles.add(role); // Удобный метод для добавления роли
     }
 
     // Методы для работы с избранными фильмами

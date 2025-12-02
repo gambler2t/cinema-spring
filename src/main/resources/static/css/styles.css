@@ -29,10 +29,11 @@ html[data-theme="dark"] {
     --bg-surface-soft: #020617;
     --bg-panel: #020617;
 
-    --bg-topbar: #020617;
+    /* делаем топбар чуть светлее и более контрастным */
+    --bg-topbar: #111827;
     --bg-search: #020617;
 
-    --text-main: #e5e7eb;
+    --text-main: #f5f5f5;
     --text-muted: #9ca3af;
     --text-on-topbar: #f9fafb;
 
@@ -146,14 +147,14 @@ table {
 }
 
 table th, table td {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #a9a9a9;
     padding: 8px 10px;
     text-align: left;
     font-size: 14px;
 }
 
 table th {
-    background-color: #f3f4f6;
+    background-color: #a9a9a9;
 }
 
 /* =========================
@@ -266,11 +267,13 @@ form.inline {
 .link-button {
     background: none;
     border: none;
-    padding: 0;
+    padding: 2px 6px;          /* добавили немного воздуха сверху/снизу и по бокам */
     margin: 0;
     color: #d1e2ff;
     font: inherit;
     cursor: pointer;
+    line-height: 1.2;          /* чтобы текст не упирался в край */
+    border-radius: 4px;        /* можно, чтобы не казалось, что края режут текст */
 }
 
 /* =========================
@@ -287,7 +290,7 @@ form.inline {
 .search-bar input[type="text"] {
     padding: 12px 16px;
     border-radius: 12px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid #f5f5f5;
     width: 300px;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -595,7 +598,7 @@ form.inline {
     padding: 12px 16px;
     background-color: #111827;
     border-radius: 16px;
-    color: #e5e7eb;
+    color: #f5f5f5;
 }
 
 .seat-row {
@@ -737,14 +740,22 @@ form.inline {
     padding: 24px 32px 40px;
 }
 
+/* Светлая тема: обычный чёрный текст */
 .movies-main h1 {
-    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     font-size: 2.5rem;
     margin-bottom: 8px;
     margin-top: 0;
+    color: #000000;
+    -webkit-text-fill-color: #000000;
+    background: none;
+}
+
+/* Тёмная тема: как было — «светлый» градиентный текст */
+html[data-theme="dark"] .movies-main h1 {
+    background: linear-gradient(135deg, #f5f5f5 0%, #f5f5f5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .side-banner {
@@ -830,7 +841,7 @@ form.inline {
     min-width: 90px;
     padding: 8px 12px;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f5f5f5;
     background: var(--bg-panel);
     text-align: center;
     font-size: 13px;
@@ -855,7 +866,7 @@ form.inline {
 }
 
 .date-pill:not(.date-pill--active):hover {
-    background: #e5e7eb;
+    background: #f5f5f5;
     border-color: #9ca3af;
     transform: translateY(-1px);
 }
@@ -868,7 +879,7 @@ form.inline {
 }
 
 .date-pill--active .date-pill__month {
-    color: #e5e7eb;
+    color: #f5f5f5;
 }
 
 /* Старые стили для date-tabs/date-chip оставляю –
@@ -887,7 +898,7 @@ form.inline {
     justify-content: center;
     padding: 6px 14px;
     border-radius: 999px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f5f5f5;
     background-color: #f9fafb;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
     font-size: 12px;
@@ -935,7 +946,7 @@ form.inline {
     gap: 6px;
     padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f5f5f5;
     background: var(--bg-panel);
     font-size: 13px;
     cursor: pointer;
@@ -950,7 +961,7 @@ form.inline {
 }
 
 .filter-btn:hover {
-    background: #e5e7eb;
+    background: #f5f5f5;
 }
 
 .filter-menu {
@@ -1004,7 +1015,7 @@ form.inline {
 
 .hall-card {
     border-radius: 14px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f5f5f5;
     padding: 12px 14px;
     background: var(--bg-panel);
 }
@@ -1595,7 +1606,7 @@ form.inline {
     width: 22px;
     text-align: center;
     font-weight: bold;
-    color: #e5e7eb;
+    color: #f5f5f5;
     font-size: 11px;
     margin: 0 6px;
     flex-shrink: 0;
@@ -1630,7 +1641,7 @@ form.inline {
 }
 
 .booking-page .seat.available:hover {
-    background-color: #e5e7eb;
+    background-color: #f5f5f5;
     border-color: #6b7280;
 }
 
@@ -1734,7 +1745,7 @@ form.inline {
     align-items: center;
     padding: 6px 10px;
     background: white;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f5f5f5;
     border-radius: 5px;
     border-left: 3px solid #10b981;
     font-size: 11px;
@@ -1763,7 +1774,7 @@ form.inline {
 }
 
 .booking-page .booking-summary {
-    background: #e5e7eb;
+    background: #f5f5f5;
     padding: 10px 12px;
     border-radius: 6px;
     margin: 15px 0;
@@ -2003,7 +2014,7 @@ html[data-theme="dark"] input,
 html[data-theme="dark"] textarea,
 html[data-theme="dark"] select {
     background-color: #020617;
-    color: #e5e7eb;
+    color: #f5f5f5;
     border-color: #1f2937;
 }
 

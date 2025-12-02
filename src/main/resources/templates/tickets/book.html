@@ -94,7 +94,9 @@
             <a th:href="@{/tickets/guest}">Мои билеты</a>
         </span>
         <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a th:href="@{/admin/movies}">Админ</a>
+            <a th:href="@{/admin/movies}">Админ: Фильмы</a>
+            <a th:href="@{/admin/screenings}">Админ: Сеансы</a>
+            <a th:href="@{/admin/users}">Админ: Пользователи</a>
         </span>
     </nav>
     <div class="auth">
@@ -107,6 +109,9 @@
                 <button type="submit" class="link-button">Выйти</button>
             </form>
         </span>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            🌙 Тёмная
+        </button>
     </div>
 </header>
 

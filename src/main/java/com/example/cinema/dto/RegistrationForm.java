@@ -6,22 +6,22 @@ import jakarta.validation.constraints.Size;
 
 public class RegistrationForm {
 
-    @NotBlank(message = "Логин обязателен")
-    @Size(min = 3, max = 32, message = "Логин должен быть от 3 до 32 символов")
+    @NotBlank(message = "Логин обязателен") // Логин не может быть пустым
+    @Size(min = 3, max = 32, message = "Логин должен быть от 3 до 32 символов") // Ограничение длины логина
     private String username;
 
-    @Size(max = 100, message = "Имя слишком длинное")
+    @Size(max = 100, message = "Имя слишком длинное") // Необязательное поле, но с ограничением длины
     private String fullName;
 
-    @Email(message = "Некорректный email")
-    @Size(max = 100, message = "Email слишком длинный")
+    @Email(message = "Некорректный email") // Проверка формата email
+    @Size(max = 100, message = "Email слишком длинный") // Ограничение длины email
     private String email;
 
-    @NotBlank(message = "Пароль обязателен")
-    @Size(min = 6, message = "Пароль должен быть не короче 6 символов")
+    @NotBlank(message = "Пароль обязателен") // Пароль обязателен
+    @Size(min = 6, message = "Пароль должен быть не короче 6 символов") // Минимальная длина пароля
     private String password;
 
-    @NotBlank(message = "Повтор пароля обязателен")
+    @NotBlank(message = "Повтор пароля обязателен") // Повтор пароля тоже обязателен
     private String confirmPassword;
 
     // getters / setters

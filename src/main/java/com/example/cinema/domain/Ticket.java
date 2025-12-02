@@ -4,34 +4,34 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "tickets")
+@Table(name = "tickets") // Таблица билетов в базе
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоинкрементный первичный ключ
     private Long id;
 
     // много билетов к одному сеансу
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "screening_id")
+    @ManyToOne(optional = false) // Каждый билет всегда привязан к какому-то сеансу
+    @JoinColumn(name = "screening_id") // Внешний ключ на таблицу сеансов
     private Screening screening;
 
     // владелец билета (пользователь) - может быть null для гостя
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) // Пользователь подгружается по мере необходимости
     @JoinColumn(name = "user_id")
     private AppUser user;
 
-    @NotBlank
+    @NotBlank // Имя покупателя обязательно
     private String customerName;
 
-    @NotBlank
+    @NotBlank // Место (ряд-место) обязательно
     private String seat;
 
     // Email покупателя (для гостей обязателен, для пользователя можно пустой)
     private String email;
 
     // Уникальный токен, который кодируем в QR
-    @Column(name = "qr_token", unique = true, length = 64)
+    @Column(name = "qr_token", unique = true, length = 64) // Уникальное значение для идентификации билета
     private String qrToken;
 
     public Ticket() {

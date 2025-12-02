@@ -10,26 +10,26 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "screenings")
+@Table(name = "screenings") // Таблица сеансов в базе
 public class Screening {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоинкрементный ID
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER) // Добавьте fetch = FetchType.EAGER
-    @JoinColumn(name = "movie_id")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER) // Много сеансов к одному фильму, фильм всегда обязателен, загружается сразу
+    @JoinColumn(name = "movie_id") // Внешний ключ на таблицу фильмов
     private Movie movie;
 
     @NotNull
-    @Future
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @Future // Дата/время сеанса должны быть в будущем (валидация)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") // Формат для биндинга из HTML-формы
     private LocalDateTime startTime;
 
-    @NotBlank
+    @NotBlank // Название зала обязательно
     private String hall;
 
-    @NotNull
+    @NotNull // Цена обязательна
     private BigDecimal price;
 
     public Screening() {

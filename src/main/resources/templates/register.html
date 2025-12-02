@@ -13,9 +13,13 @@
     <nav>
         <a th:href="@{/movies}">Фильмы</a>
         <a th:href="@{/about}">О кинотеатре</a>
+        <a th:href="@{/tickets/guest}">Мои билеты</a>
     </nav>
     <div class="auth">
         <a th:href="@{/login}">Войти</a>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            🌙 Тёмная
+        </button>
     </div>
 </header>
 

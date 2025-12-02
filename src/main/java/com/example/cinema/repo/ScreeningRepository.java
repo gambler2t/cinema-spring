@@ -6,11 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Repository // Репозиторий для работы с сущностью Screening (сеансы)
 public interface ScreeningRepository extends JpaRepository<Screening, Long> {
 
     // Этот метод должен быть для PublicController
+    // Находит все сеансы по id фильма и сортирует их по времени начала по возрастанию
     List<Screening> findByMovie_IdOrderByStartTimeAsc(Long movieId);
 
-    // Другие методы если нужны...
+    // Удалить все сеансы указанного фильма
+    void deleteByMovie_Id(Long movieId);
 }

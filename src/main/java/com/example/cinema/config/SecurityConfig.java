@@ -14,10 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
 
-@Configuration
+@Configuration // Класс с конфигурацией Spring Security
 public class SecurityConfig {
 
-    @Bean
+    @Bean // Определяем цепочку фильтров безопасности для HTTP-запросов
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
@@ -33,18 +33,18 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/movies") // После выхода — редирект на главную страницу
                         .permitAll())
-                .csrf(csrf -> csrf.disable()) // Отключаем CSRF для простоты (для продакшн-системы нужно включить)
+                .csrf(csrf -> csrf.disable()) // Отключаем CSRF для простоты
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())); // Разрешаем фреймы с того же источника
 
-        return http.build();
+        return http.build(); // Собираем и возвращаем конфигурацию фильтров
     }
 
-    @Bean
+    @Bean // Сервис, который Spring Security использует для загрузки пользователей по логину
     public UserDetailsService userDetailsService(AppUserRepository userRepository) {
         return username -> {
             AppUser user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username)); // Если пользователя нет — бросаем исключение
 
             // Присваиваем роли пользователю
             List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
@@ -52,9 +52,9 @@ public class SecurityConfig {
                     .toList();
 
             return new org.springframework.security.core.userdetails.User(
-                    user.getUsername(),
-                    user.getPassword(),
-                    authorities
+                    user.getUsername(), // Логин из базы
+                    user.getPassword(), // Уже закодированный пароль
+                    authorities // Коллекция ролей/прав для Spring Security
             );
         };
     }

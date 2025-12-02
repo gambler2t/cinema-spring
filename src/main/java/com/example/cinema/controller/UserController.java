@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('USER')") // Все методы контроллера доступны только авторизованным пользователям с ролью USER
 public class UserController {
 
-    private final TicketRepository ticketRepository;
-    private final AppUserRepository userRepository;
-    private final MovieRepository movieRepository;
+    private final TicketRepository ticketRepository; // Репозиторий для работы с билетами пользователя
+    private final AppUserRepository userRepository;  // Репозиторий пользователей
+    private final MovieRepository movieRepository;   // Репозиторий фильмов (для избранного)
 
     public UserController(TicketRepository ticketRepository,
                           AppUserRepository userRepository,
@@ -38,24 +38,27 @@ public class UserController {
 
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
-        String username = authentication.getName();
+        String username = authentication.getName(); // Текущий логин пользователя
 
         AppUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username)); // Проверяем, что пользователь существует
 
-        List<Ticket> allTickets = ticketRepository.findByUser_Username(username);
+        List<Ticket> allTickets = ticketRepository.findByUser_Username(username); // Все билеты пользователя
         LocalDateTime now = LocalDateTime.now();
 
+        // Будущие билеты (сеанс ещё не начался)
         List<Ticket> upcomingTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isAfter(now))
-                .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
+                .sorted(Comparator.comparing(t -> t.getScreening().getStartTime())) // Сортируем по времени сеанса
                 .collect(Collectors.toList());
 
+        // Прошедшие билеты (сеанс уже был)
         List<Ticket> pastTickets = allTickets.stream()
                 .filter(t -> t.getScreening().getStartTime().isBefore(now))
                 .sorted(Comparator.comparing(t -> t.getScreening().getStartTime()))
                 .collect(Collectors.toList());
 
+        // Последние 4 избранных фильма (по id, с конца)
         List<Movie> recentFavorites = user.getFavoriteMovies().stream()
                 .sorted(Comparator.comparing(Movie::getId).reversed())
                 .limit(4)
@@ -66,7 +69,7 @@ public class UserController {
         model.addAttribute("pastTickets", pastTickets);
         model.addAttribute("recentFavorites", recentFavorites);
 
-        return "user/profile";
+        return "user/profile"; // Шаблон страницы профиля
     }
 
     @PostMapping("/profile")
@@ -77,35 +80,38 @@ public class UserController {
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
+        // Обновляем основные поля профиля (без смены логина/ролей/пароля)
         user.setFullName(form.getFullName());
         user.setEmail(form.getEmail());
         user.setBio(form.getBio());
 
-        userRepository.save(user);
+        userRepository.save(user); // Сохраняем изменения
 
-        return "redirect:/user/profile?updated";
+        return "redirect:/user/profile?updated"; // Редирект с флагом успешного обновления
     }
 
     @PostMapping("/tickets/{id}/delete")
     public String deleteTicket(@PathVariable Long id, Principal principal) {
 
         if (principal == null) {
-            return "redirect:/login";
+            return "redirect:/login"; // Без авторизации удалять нельзя
         }
 
         Ticket ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null && ticket.getUser() != null) {
             String currentUser = principal.getName();
 
+            // Проверяем, что билет принадлежит текущему пользователю
             if (currentUser.equals(ticket.getUser().getUsername())) {
                 LocalDateTime now = LocalDateTime.now();
+                // Удалять можно только билет на будущий сеанс
                 if (ticket.getScreening().getStartTime().isAfter(now)) {
                     ticketRepository.delete(ticket);
                 }
             }
         }
 
-        return "redirect:/user/profile";
+        return "redirect:/user/profile"; // После попытки удаления возвращаемся в профиль
     }
 
     @GetMapping("/favorites")
@@ -113,8 +119,8 @@ public class UserController {
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        model.addAttribute("favorites", user.getFavoriteMovies());
-        return "user/favorites";
+        model.addAttribute("favorites", user.getFavoriteMovies()); // Список избранных фильмов пользователя
+        return "user/favorites"; // Страница «Избранное»
     }
 
     @PostMapping("/favorites/{movieId}/toggle")
@@ -128,14 +134,16 @@ public class UserController {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
 
+        // Если фильм уже в избранном — убираем, иначе добавляем
         if (user.getFavoriteMovies().contains(movie)) {
             user.getFavoriteMovies().remove(movie);
         } else {
             user.getFavoriteMovies().add(movie);
         }
 
-        userRepository.save(user);
+        userRepository.save(user); // Сохраняем изменения избранного
 
+        // Возвращаем пользователя обратно на страницу, откуда он пришёл
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/movies");
     }
