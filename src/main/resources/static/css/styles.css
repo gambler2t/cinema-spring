@@ -267,13 +267,13 @@ form.inline {
 .link-button {
     background: none;
     border: none;
-    padding: 2px 6px;          /* добавили немного воздуха сверху/снизу и по бокам */
+    padding: 2px 6px;
     margin: 0;
     color: #d1e2ff;
     font: inherit;
     cursor: pointer;
-    line-height: 1.2;          /* чтобы текст не упирался в край */
-    border-radius: 4px;        /* можно, чтобы не казалось, что края режут текст */
+    line-height: 1.2;
+    border-radius: 4px;
 }
 
 /* =========================
@@ -750,7 +750,7 @@ form.inline {
     background: none;
 }
 
-/* Тёмная тема: как было — «светлый» градиентный текст */
+/* Тёмная тема: градиентный светлый текст */
 html[data-theme="dark"] .movies-main h1 {
     background: linear-gradient(135deg, #f5f5f5 0%, #f5f5f5 100%);
     -webkit-background-clip: text;
@@ -836,7 +836,7 @@ html[data-theme="dark"] .movies-main h1 {
     border-radius: 999px;
 }
 
-/* Таблетка даты, используется в movies/details.html как .date-pill */
+/* Таблетка даты */
 .date-pill {
     min-width: 90px;
     padding: 8px 12px;
@@ -882,8 +882,7 @@ html[data-theme="dark"] .movies-main h1 {
     color: #f5f5f5;
 }
 
-/* Старые стили для date-tabs/date-chip оставляю –
-   если где-то ещё используются, они по-прежнему работают */
+/* Старые стили для date-tabs/date-chip */
 .date-tabs {
     margin: 14px 0 10px;
     display: flex;
@@ -1039,8 +1038,7 @@ html[data-theme="dark"] .movies-main h1 {
     gap: 8px;
 }
 
-/* Время сеанса – новая красивая таблетка
-   (используется в movies/details.html как .time-chip) */
+/* Время сеанса */
 
 .time-chip {
     display: inline-flex;
@@ -1074,7 +1072,7 @@ html[data-theme="dark"] .movies-main h1 {
     transform: translateY(-1px);
 }
 
-/* Если где-то остаётся таблица с .screenings-table – оставляю стили */
+/* Таблица сеансов (если где-то осталась) */
 
 .screenings-table {
     width: 100%;
@@ -1112,7 +1110,7 @@ html[data-theme="dark"] .movies-main h1 {
     border-radius: 0 10px 10px 0;
 }
 
-/* Отдельная таблетка цены, если нужно */
+/* Таблетка цены */
 
 .price-chip {
     display: inline-flex;
@@ -1494,8 +1492,9 @@ html[data-theme="dark"] .movies-main h1 {
     transform: scale(1.1);
 }
 
+/* текстовые подписи в блоке бронирования */
 .no-seats-message {
-    color: #6c757d;
+    color: var(--text-muted);
     font-style: italic;
     text-align: center;
     margin: 20px 0;
@@ -1511,10 +1510,11 @@ html[data-theme="dark"] .movies-main h1 {
 .booking-summary p {
     margin: 8px 0;
     font-size: 16px;
+    color: var(--text-main);
 }
 
 .selection-info {
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 20px;
     font-style: italic;
 }
@@ -1686,7 +1686,7 @@ html[data-theme="dark"] .movies-main h1 {
     margin: 12px 0;
     justify-content: center;
     flex-wrap: wrap;
-    background: #f8f9fa;
+    background: var(--bg-panel);
     padding: 10px 16px;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -1698,6 +1698,7 @@ html[data-theme="dark"] .movies-main h1 {
     gap: 5px;
     font-size: 12px;
     font-weight: 500;
+    color: var(--text-main);
 }
 
 .booking-page .legend-color {
@@ -1725,7 +1726,7 @@ html[data-theme="dark"] .movies-main h1 {
 .booking-page .selected-seats-section {
     margin: 20px 0;
     padding: 15px;
-    background: #f8f9fa;
+    background: var(--bg-panel);
     border-radius: 8px;
     width: 100%;
     box-sizing: border-box;
@@ -1744,7 +1745,7 @@ html[data-theme="dark"] .movies-main h1 {
     justify-content: space-between;
     align-items: center;
     padding: 6px 10px;
-    background: white;
+    background: var(--bg-surface);
     border: 1px solid #f5f5f5;
     border-radius: 5px;
     border-left: 3px solid #10b981;
@@ -1774,24 +1775,25 @@ html[data-theme="dark"] .movies-main h1 {
 }
 
 .booking-page .booking-summary {
-    background: #f5f5f5;
+    background: var(--bg-panel);
     padding: 10px 12px;
     border-radius: 6px;
     margin: 15px 0;
     font-size: 13px;
     border-left: 4px solid #3b82f6;
+    color: var(--text-main);
 }
 
 .booking-page .selection-info {
     text-align: center;
-    color: #6b7280;
+    color: var(--text-muted);
     margin-bottom: 12px;
     font-style: italic;
     font-size: 12px;
 }
 
 .booking-page .no-seats-message {
-    color: #6b7280;
+    color: var(--text-muted);
     font-style: italic;
     text-align: center;
     margin: 12px 0;
@@ -1800,16 +1802,17 @@ html[data-theme="dark"] .movies-main h1 {
 
 .booking-page .seat-info {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-main);
 }
 
 .booking-page .ticket-screening-info {
-    background: #f8f9fa;
+    background: var(--bg-panel);
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 20px;
     border-left: 4px solid #3b82f6;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    color: var(--text-main);
 }
 
 .booking-page .ticket-screening-info p {
